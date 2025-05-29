@@ -1,0 +1,179 @@
+const {
+    getFieldsHoldingPrintConfig,
+    getAnnotatedParamsOfAction,
+    getPrintConfigFromActionOrEntity,
+    getQueueValueHelpEntity,
+} = require('../../lib/annotation-helper');
+
+const SELECT = jest.fn();
+
+jest.mock('@sap/cds', () => ({
+    context: { user: { id: 'test-user' } },
+    SELECT: {
+        from: jest.fn()
+    }
+}));
+
+describe('annotation-helper', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe('getFieldsHoldingPrintConfig', () => {
+        afterEach(() => {
+            jest.clearAllMocks();
+        });
+
+        it('should store and return fields holding print configuration', async () => {
+            const mockEntity = {
+                name: 'TestEntity',
+                elements: {
+                    field1: { '@print.queue.SourceEntity': true, name: 'queueField' },
+                    field2: { '@print.numberOfCopies': true, name: 'copiesField' },
+                },
+            };
+
+            const result = await getFieldsHoldingPrintConfig(mockEntity);
+
+            expect(result.get('TestEntity')).toEqual({
+                genericConfigFields: {
+                    qNameField: 'queueField',
+                    numberOfCopiesField: 'copiesField',
+                    contentFieldsWithFileName: [],
+                },
+                actionSpecificConfigFields: {},
+            });
+        });
+
+        it('should return an empty map if no annotated fields are found', async () => {
+            const mockEntity = { name: 'TestEntity', elements: {} };
+            Map.prototype.set = jest.fn();
+
+            let myModule;
+            jest.isolateModules(() => {
+                myModule = require('../../lib/annotation-helper');
+            });
+            const result = await myModule.getFieldsHoldingPrintConfig(mockEntity);
+
+            expect(result.size).toBe(0);
+        });
+    });
+
+    describe('getAnnotatedParamsOfAction', () => {
+        afterEach(() => {
+            jest.clearAllMocks();
+            jest.resetModules();
+        });
+
+        it('should store and return annotated parameters of an action', async () => {
+            const mockAction = {
+                name: 'TestAction',
+                parent: { name: 'TestEntity' },
+                params: {
+                    param1: { '@print.queue': true, name: 'queueParam' },
+                },
+            };
+
+            const fieldsHoldingPrintConfig = new Map();
+            fieldsHoldingPrintConfig.set('TestEntity', {
+                actionSpecificConfigFields: {
+                    qname: { field: 'queueField', usedInActions: ['TestAction'] },
+                },
+            });
+
+            const result = await getAnnotatedParamsOfAction(mockAction);
+
+            expect(result.get('TestAction')).toEqual({
+                qNameField: 'queueField',
+            });
+        });
+
+    //     it('should return an empty map if no annotated parameters are found', async () => {
+    //         const mockAction = { name: 'TestAction', parent: { name: 'TestEntity' }, params: {} };
+
+    //         const result = await getAnnotatedParamsOfAction(mockAction);
+
+    //         expect(result.size).toBe(0);
+    //     });
+    });
+
+    // describe('getPrintConfigFromActionOrEntity', () => {
+    //     it('should return print configuration from action or entity', async () => {
+    //         const mockReq = {
+    //             target: { name: 'TestEntity' },
+    //             event: 'TestAction',
+    //             data: { queueField: 'Printer1', copiesField: 2 },
+    //             params: [{ ID: '123' }],
+    //             entity: 'TestEntity',
+    //         };
+
+    //         const fieldsHoldingPrintConfig = new Map();
+    //         fieldsHoldingPrintConfig.set('TestEntity', {
+    //             genericConfigFields: {
+    //                 qNameField: 'queueField',
+    //                 numberOfCopiesField: 'copiesField',
+    //                 contentFieldsWithFileName: [],
+    //             },
+    //         });
+
+    //         const annotatedParametersOfAction = new Map();
+    //         annotatedParametersOfAction.set('TestAction', {});
+
+    //         SELECT.mockResolvedValue([{ queueField: 'Printer1', copiesField: 2 }]);
+
+    //         const result = await getPrintConfigFromActionOrEntity(mockReq);
+
+    //         expect(result).toEqual({
+    //             qname: 'Printer1',
+    //             numberOfCopies: 2,
+    //             docsToPrint: [],
+    //         });
+    //     });
+
+    //     it('should throw an error if print configuration is missing', async () => {
+    //         const mockReq = {
+    //             target: { name: 'TestEntity' },
+    //             event: 'TestAction',
+    //             data: {},
+    //             params: [{ ID: '123' }],
+    //             entity: 'TestEntity',
+    //         };
+
+    //         const fieldsHoldingPrintConfig = new Map();
+    //         fieldsHoldingPrintConfig.set('TestEntity', {
+    //             genericConfigFields: {
+    //                 qNameField: 'queueField',
+    //                 numberOfCopiesField: 'copiesField',
+    //                 contentFieldsWithFileName: [],
+    //             },
+    //         });
+
+    //         SELECT.mockResolvedValue([{}]);
+
+    //         await expect(getPrintConfigFromActionOrEntity(mockReq)).rejects.toThrow(
+    //             'Print Configuration missing; Check if @print.queue annotation is maintained or the annotated field is populated'
+    //         );
+    //     });
+    // });
+
+    // describe('getQueueValueHelpEntity', () => {
+    //     it('should return the source entity name with the field annotated with @print.queue', () => {
+    //         const mockEntity = {
+    //             field1: { '@print.queue.SourceEntity': true },
+    //             field2: {},
+    //         };
+
+    //         const result = getQueueValueHelpEntity(mockEntity);
+
+    //         expect(result).toBe(true);
+    //     });
+
+    //     it('should return undefined if no field is annotated with @print.queue.SourceEntity', () => {
+    //         const mockEntity = { field1: {}, field2: {} };
+
+    //         const result = getQueueValueHelpEntity(mockEntity);
+
+    //         expect(result).toBeUndefined();
+    //     });
+    // });
+});

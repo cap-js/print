@@ -1,0 +1,52 @@
+{
+  "name": "@cap-js/print",
+  "version": "1.0.0",
+  "description": "CAP plugin for SAP Cloud Print Service.",
+  "repository": "@cap-js/print",
+  "homepage": "https://cap.cloud.sap/",
+  "main": "cds-plugin.js",
+  "author": "SAP SE (https://www.sap.com)",
+  "license": "Apache-2.0",
+  "files": [
+    "lib",
+    "package.json",
+    "README.md"
+  ],
+  "keywords": [
+    "sap",
+    "cap",
+    "cps",
+    "print",
+    "plugin"
+  ],
+  "dependencies": {
+    "@cap-js/print": "file:",
+    "@sap-cloud-sdk/connectivity": "^3.26.4",
+    "@sap/xssec": "^3.6.2",
+    "axios": "^1.8.4"
+  },
+  "peerDependencies": {
+    "@sap/cds": "^8"
+  },
+  "devDependencies": {
+    "@cap-js/cds-test": "^0.2.0",
+    "@cap-js/sqlite": "^1",
+    "eslint": "^9.4.0",
+    "eslint-plugin-jest": "^28.5.0",
+    "jest": "^29.7.0"
+  },
+  "cds": {
+    "requires": {
+      "print": {
+        "vcap": {
+          "tag": "Print"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "jest --coverage --config jest.config.js",
+    "integration-test": "jest --config jest-integration.config.js",
+    "lint": "npx eslint --fix . --no-cache"
+  }
+}
