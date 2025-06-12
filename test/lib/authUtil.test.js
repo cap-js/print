@@ -23,41 +23,44 @@ describe('test authUtil model', () => {
     afterEach(() => {
         jest.clearAllMocks();
     });
-    
-    describe('test readVcapServices function', () => {        
+
+    describe('test readVcapServices function', () => {
+        let originalEnv;
+        let mockLogger;
+        beforeEach(() => {
+            originalEnv = cds.env;
+            mockLogger = { error: jest.fn(), info: jest.fn() };
+            cds.log = jest.fn(() => mockLogger);
+        });
         afterEach(() => {
+            cds.env = originalEnv;
             jest.clearAllMocks();
         });
 
         it('should return service credentials when found', async () => {
-
-            const mockCredentials = { clientid: 'test-client', clientsecret: 'test-secret' };
-            xsenv.serviceCredentials.mockReturnValue(mockCredentials);
-
-            const mockReq = { success: jest.fn() };
-            const result = await readVcapServices(mockReq);
-
-            expect(result).toEqual(mockCredentials);
-            expect(xsenv.serviceCredentials).toHaveBeenCalledWith({ tag: 'Print' });
+            cds.env = { requires: { print: { credentials: { tag: 'Print' } } } };
+            const req = { error: jest.fn() };
+            const result = await readVcapServices(req);
+            expect(result).toEqual({ tag: 'Print' });
+            expect(req.error).not.toHaveBeenCalled();
         });
 
-        it('should log an error and return undefined when service credentials are not found', async () => {
-            jest.resetModules();
-            xsenv.serviceCredentials.mockImplementation(() => {
-                throw new Error('Service not found');
-            });
-
-            const mockReq = { error: jest.fn() };
+        it('should log an error and return undefined when service credentials are not found in production', async () => {
+            cds.env = { requires: {} };
             process.env.NODE_ENV = 'production';
-            let result = await readVcapServices(mockReq);
+            const req = { error: jest.fn() };
+            const result = await readVcapServices(req);
             expect(result).toBeUndefined();
-            expect(mockLogger.error).toHaveBeenCalledWith('Print service not found');
-
-            process.env.NODE_ENV = 'development';
-            result = await readVcapServices(mockReq);
-            expect(result).toBeUndefined();
-            expect(mockReq.error).toHaveBeenCalled();
+            expect(req.error).toHaveBeenCalledWith(500, 'Print service not found');
         });
+        it('should log error and return undefined in non-production when credentials missing', async () => {
+                cds.env = { requires: {} };
+                process.env.NODE_ENV = 'development';
+                const req = { error: jest.fn() };
+                const result = await readVcapServices(req);
+                expect(result).toBeUndefined();
+                expect(req.error).not.toHaveBeenCalled();
+            });
     });
 
     describe('test getJwt function', () => {
