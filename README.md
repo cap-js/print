@@ -1,9 +1,10 @@
 # Welcome to @print
 
+[![REUSE status](https://api.reuse.software/badge/github.com/cap-js/print)](https://api.reuse.software/info/github.com/cap-js/print)
+
 ## About this project
 
 `@print` is a CDS plugin providing print service features, [SAP Print Service](https://api.sap.com/api/PRINTAPI/overview).
-
 
 ## Table of Contents
 
@@ -11,11 +12,11 @@
 - [Requirements](#requirements)
 - [Setup](#setup)
 
-## Requirements
+## Requirements and Setup
 
 See [Getting Started](https://cap.cloud.sap/docs/get-started) on how to jumpstart your development and grow as you go with SAP Cloud Application Programming Model.
 
-## Setup
+Usage of this plugin requires a valid subscription of the [SAP Print Service](https://help.sap.com/docs/SCP_PRINT_SERVICE).
 
 To integrate the print functionality in your application, simply annotate any action with `@print`. This annotation automatically manages the process of sending documents to the print queues, requiring no additional setup for handling print jobs.
 
@@ -141,3 +142,19 @@ If you are running the application in a production way locally(E.g. adding VCAP_
     "start": "SUBSCRIBER_SUBDOMAIN_FOR_LOCAL_TESTING=sub01 cds-serve"
 }
 ```
+
+## Support, Feedback, Contributing
+
+This project is open to feature requests/suggestions, bug reports etc. via [GitHub issues](https://github.com/cap-js/print/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
+
+## Security / Disclosure
+
+If you find any bug that may be a security problem, please follow our instructions at [in our security policy](https://github.com/cap-js/print/security/policy) on how to report it. Please do not create GitHub issues for security-related doubts or problems.
+
+## Code of Conduct
+
+We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone. By participating in this project, you agree to abide by its [Code of Conduct](https://github.com/cap-js/.github/blob/main/CODE_OF_CONDUCT.md) at all times.
+
+## Licensing
+
+Copyright 2025 SAP SE or an SAP affiliate company and print contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/cap-js/print).
