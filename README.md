@@ -1,10 +1,10 @@
-# Welcome to @print
+# Welcome to @cap-js/print
 
 [![REUSE status](https://api.reuse.software/badge/github.com/cap-js/print)](https://api.reuse.software/info/github.com/cap-js/print)
 
 ## About this project
 
-`@print` is a CDS plugin providing print service features, [SAP Print Service](https://api.sap.com/api/PRINTAPI/overview).
+CDS plugin for SAP Print service (package `@cap-js/print`) is a CDS plugin providing print service features through integration with [SAP Print Service](https://api.sap.com/api/PRINTAPI/overview).
 
 ## Table of Contents
 
