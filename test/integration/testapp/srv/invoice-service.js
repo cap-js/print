@@ -20,68 +20,13 @@ module.exports = class ProductService extends cds.ApplicationService {
             });
         };
 
-        // Function to fetch Local Printers based on the OS
-        const fetchLocalPrinters = async () => {
-            const platform = os.platform();
-            let command;
-            if (platform === 'darwin') {
-                // macOS
-                command = `lpstat -p`;
-            } else if (platform === 'win32') {
-                // Windows
-                command = `wmic printer get name`;
-            } else {
-                throw new Error('Unsupported operating system');
-            }
-            try {
-                const result = await execCommand(command);
-                return result;
-            } catch (error) {
-                return null;
-            }
-        };
-        // Function to parse Printer Names based on the OS
-        const parsePrinterNames = (printerNames) => {
-            const platform = os.platform();
-            let printers = [];
-
-            if (platform === 'darwin') {
-                // macOS: Extract printers starting with 'printer' and take the second word
-                printers = printerNames
-                    .split('\n')
-                    .filter(line => line.startsWith('printer'))
-                    .map(line => line.split(' ')[1]);
-            } else if (platform === 'win32') {
-                // Windows: Split by new lines, remove empty entries, and trim the names
-                const printerArray = printerNames.split('\n')                // Split by new lines
-                    .map(line => line.trim())                                // Trim any whitespace
-                    .filter(line => line && !line.startsWith('Name'))        // Remove empty lines and header
-
-                printers = printerArray.map(line => {
-                    if (line.includes('global.corp.sap')) {
-                        // Remove the server path and keep the last part
-                        return line.replace(/\\\\.*?\\/, '');                // Remove everything up to the last backslash
-                    }
-                    return line;                                             // Return the line as is if no match
-                }).filter(line => line);                                     // Remove any empty strings
-            }
-
-            return printers;
-        };
-        this.on('fetchQueues', async (req) => {
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
-            return queues;
-        });
-
         this.on('noMainDocument', async (req) => {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.fileName = "Invoice_343.pdf";
             req.data.attachmentName = "Invoice_343_attachment.pdf";
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.fileName));
             req.data.attachment = fs.readFileSync(path.join(__dirname, req.data.fileName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName_ID = queues[0];
             req.data.numberOfCopies = 2;
         });
@@ -96,8 +41,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.document1 = fs.readFileSync(path.join(__dirname, req.data.documentName));
             req.data.attachment = fs.readFileSync(path.join(__dirname, req.data.documentName));
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.documentName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName_ID = queues[0];
             req.data.numberOfCopies = 2;
         });
@@ -112,8 +56,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.document1 = fs.readFileSync(path.join(__dirname, req.data.documentName));
             req.data.attachment = fs.readFileSync(path.join(__dirname, req.data.documentName));
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.documentName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName_ID = queues[0];
             req.data.numberOfCopies = 2;
         });
@@ -122,8 +65,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.fileName = "Invoice_343.pdf";
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.fileName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName_ID = queues[0];
             req.data.numberOfCopies = 2;
         });
@@ -139,8 +81,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.fileName = "Invoice_343.pdf";
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.fileName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName1_ID = queues[0];
         });
 
@@ -148,8 +89,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.fileName = "Invoice_343.pdf";
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.fileName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName1_ID = queues[0];
         });
 
@@ -157,8 +97,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.documentName1 = "Invoice_343.pdf";
             req.data.document1 = fs.readFileSync(path.join(__dirname, req.data.documentName1));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName_ID = queues[0];
             req.data.numberOfCopies = 2;
         });
@@ -167,8 +106,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.documentName1 = "Invoice_343.pdf";
             req.data.document1 = fs.readFileSync(path.join(__dirname, req.data.documentName1));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName_ID = queues[0];
             req.data.numberOfCopies = 2;
         });
@@ -177,8 +115,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.fileName = "Invoice_343.pdf";
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.fileName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName1_ID = queues[0];
             req.data.numberOfCopies1 = 2;
         });
@@ -187,8 +124,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.fileName = "Invoice_343.pdf";
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.fileName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName1_ID = queues[0];
             req.data.numberOfCopies1 = 2;
         });
@@ -197,8 +133,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.fileName = "Invoice_343.pdf";
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.fileName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName1_ID = queues[0];
             req.data.numberOfCopies1 = 2;
         });
@@ -207,8 +142,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.fileName = "Invoice_343.pdf";
             req.data.fileContent = fs.readFileSync(path.join(__dirname, req.data.fileName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName1_ID = queues[0];
             req.data.numberOfCopies1 = 2;
         });
@@ -217,8 +151,7 @@ module.exports = class ProductService extends cds.ApplicationService {
             req.data.ID = "d37ce60b-2b3b-448d-9c43-2d6526f28503"
             req.data.fileName = "Invoice_343.pdf";
             req.data.document2 = fs.readFileSync(path.join(__dirname, req.data.fileName));
-            const printers = await fetchLocalPrinters();
-            const queues =  parsePrinterNames(printers);
+            const queues =  'test';
             req.data.qName_ID = queues[0];
             req.data.numberOfCopies = 2;
         })
