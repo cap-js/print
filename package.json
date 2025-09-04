@@ -8,6 +8,7 @@
   "author": "SAP SE (https://www.sap.com)",
   "license": "Apache-2.0",
   "files": [
+    "index.cds",
     "lib",
     "package.json",
     "README.md"
