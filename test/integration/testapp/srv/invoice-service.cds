@@ -1,9 +1,9 @@
 using {my.invoices as db} from '../db/schema';
+using { sap.print as sp } from '@cap-js/print';
 
 @impl: './invoice-service.js'
 service InvoiceService {
     entity Invoices       as projection on db.Invoice;
-    entity Queues         as projection on db.Queues;
 
     entity Document       as
         projection on db.Invoice {
@@ -28,27 +28,27 @@ service InvoiceService {
             @print.numberOfCopies
             numberOfCopies,
 
-            @print.fileContent: {
-                fileNameField: 'documentName', usedInAction: ['multipleMainDocument']
-            }
-            @print.MainDocument
-            document,
-            documentName,
+            // @print.fileContent: {
+            //     fileNameField: 'documentName', usedInAction: ['multipleMainDocument']
+            // }
+            // @print.MainDocument
+            // document,
+            // documentName,
 
-            @print.fileContent: {
-                fileNameField: 'documentName1', usedInAction: [
-                    'multipleMainDocument',
-                    'usedInActionSuccess'
-                ]
-            }
-            @print.MainDocument
-            document1,
-            documentName1,
+            // @print.fileContent: {
+            //     fileNameField: 'documentName1', usedInAction: [
+            //         'multipleMainDocument',
+            //         'usedInActionSuccess'
+            //     ]
+            // }
+            // @print.MainDocument
+            // document1,
+            // documentName1,
 
-            @print.fileContent: {
-                usedInAction: ['fileNameFieldMissing']
-            }
-            document2
+            // @print.fileContent: {
+            //     usedInAction: ['fileNameFieldMissing']
+            // }
+            // document2
         }
         actions {
             @print
@@ -89,28 +89,28 @@ service InvoiceService {
             }
             numberOfCopies,
 
-            @print.queue         : {
-                SourceEntity: 'Queues', usedInAction: [
-                    'queueNotFilled',
-                    'noCopiesAnnotation',
-                    'copiesNotFilled',
-                    'queueUsedInActionSucess',
-                    'copiesUsedInActionSuccess',
-                    'copiesUsedInActionFail'
-                ]
-            }
-            qName1,
+            // @print.queue         : {
+            //     SourceEntity: 'Queues', usedInAction: [
+            //         'queueNotFilled',
+            //         'noCopiesAnnotation',
+            //         'copiesNotFilled',
+            //         'queueUsedInActionSucess',
+            //         'copiesUsedInActionSuccess',
+            //         'copiesUsedInActionFail'
+            //     ]
+            // }
+            // qName1,
 
-            @print.numberOfCopies: {
-                usedInAction: [
-                    'copiesNotFilled',
-                    'copiesUsedInActionSuccess',
-                    'queueUsedInActionFail',
-                    'queueUsedInActionSucess'
-                ]
-            }
-            numberOfCopies1,
-            numberOfCopies2
+            // @print.numberOfCopies: {
+            //     usedInAction: [
+            //         'copiesNotFilled',
+            //         'copiesUsedInActionSuccess',
+            //         'queueUsedInActionFail',
+            //         'queueUsedInActionSucess'
+            //     ]
+            // }
+            // numberOfCopies1,
+            // numberOfCopies2
         }
         actions {
             @print
@@ -137,5 +137,5 @@ service InvoiceService {
             @print
             action copiesUsedInActionFail();
         }
-
+    entity Queues as projection on sp.Queues;
 }
