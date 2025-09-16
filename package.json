@@ -10,6 +10,7 @@
   "files": [
     "index.cds",
     "lib",
+    "srv",
     "package.json",
     "README.md"
   ],
@@ -21,7 +22,7 @@
     "plugin"
   ],
   "dependencies": {
-    "@cap-js/print": "file:",
+    "@cap-js/print": "files:",
     "@sap-cloud-sdk/connectivity": "^3.26.4",
     "@sap/xssec": "^3.6.2",
     "axios": "^1.8.4"
@@ -41,7 +42,15 @@
       "print": {
         "vcap": {
           "tag": "Print"
+        },
+      "[development]": {
+          "kind": "print-to-console"
         }
+      }
+    },
+    "kinds": {
+      "print-to-console": {
+        "impl": "./srv/printToConsole.js"
       }
     }
   },
