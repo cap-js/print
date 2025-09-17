@@ -22,7 +22,7 @@
     "plugin"
   ],
   "dependencies": {
-    "@cap-js/print": "files:",
+    "@cap-js/print": "file:",
     "@sap-cloud-sdk/connectivity": "^3.26.4",
     "@sap/xssec": "^3.6.2",
     "axios": "^1.8.4"
