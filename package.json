@@ -41,17 +41,8 @@
     "requires": {
       "print": {
         "vcap": {
-          "tag": "Print"
-        },
-      "[development]": {
-          "kind": "print-to-console"
+          "tag": "print"
         }
-      }
-    },
-    "kinds": {
-      "print-to-console": {
-        "impl": "./srv/printToConsole.js"
-      }
     }
   },
   "scripts": {
