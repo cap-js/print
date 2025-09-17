@@ -43,6 +43,7 @@
         "vcap": {
           "tag": "print"
         }
+      }
     }
   },
   "scripts": {
@@ -50,5 +51,4 @@
     "integration-test": "jest --config jest-integration.config.js",
     "lint": "npx eslint --fix . --no-cache"
   }
-}
 }
