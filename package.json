@@ -10,7 +10,6 @@
   "files": [
     "index.cds",
     "lib",
-    "srv",
     "package.json",
     "README.md"
   ],
