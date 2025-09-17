@@ -24,7 +24,7 @@
     "@cap-js/print": "file:",
     "@sap-cloud-sdk/connectivity": "^3.26.4",
     "@sap/xssec": "^3.6.2",
-    "axios": "^1.8.4"
+    "axios": "^1.12.2"
   },
   "peerDependencies": {
     "@sap/cds": "^8"
