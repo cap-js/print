@@ -51,3 +51,4 @@
     "lint": "npx eslint --fix . --no-cache"
   }
 }
+}
