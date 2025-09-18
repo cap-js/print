@@ -143,6 +143,14 @@ If you are running the application in a production way locally(E.g. adding VCAP_
 }
 ```
 
+If you are running the application in offline mode which is without remote connection to the online environment, you can add the environmental variable `PRINT_CONSOLE_MODE=true cds watch` in the `package.json` as shown below.
+
+```json
+"scripts": {
+    "watch-offline": "PRINT_CONSOLE_MODE=true cds watch"
+}
+```
+
 ## Support, Feedback, Contributing
 
 This project is open to feature requests/suggestions, bug reports etc. via [GitHub issues](https://github.com/cap-js/print/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
