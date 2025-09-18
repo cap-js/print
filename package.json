@@ -40,7 +40,7 @@
     "requires": {
       "print": {
         "vcap": {
-          "tag": "Print"
+          "tag": "print"
         }
       }
     }
