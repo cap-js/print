@@ -10,8 +10,7 @@
   "files": [
     "index.cds",
     "lib",
-    "package.json",
-    "README.md"
+    "srv"
   ],
   "keywords": [
     "sap",
@@ -32,15 +31,33 @@
   "devDependencies": {
     "@cap-js/cds-test": "^0.2.0",
     "@cap-js/sqlite": "^1",
+    "@sap/cds": "^8",
     "eslint": "^9.4.0",
     "eslint-plugin-jest": "^28.5.0",
     "jest": "^29.7.0"
   },
   "cds": {
     "requires": {
+      "destinations": true,
       "print": {
+        "[development]": {
+          "kind": "print-to-console"
+        },
+        "[production]": {
+          "destination": "SAP_Print_Service", 
+          "kind": "print-to-service"
+        },
         "vcap": {
           "tag": "print"
+        },
+        "outbox": true
+      },
+      "kinds": {
+        "print-to-console": {
+          "impl": "@cap-js/print/srv/printToConsole"
+        },
+        "print-to-service": {
+          "impl": "@cap-js/print/srv/printToPrintService"
         }
       }
     }
