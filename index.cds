@@ -1,6 +1,7 @@
 namespace sap.print;
 
-@cds.skip.peristance
+
+@cds.persistence.skip
 entity Queues {
     key ID          : String;
         description : String;
