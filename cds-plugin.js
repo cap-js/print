@@ -44,8 +44,19 @@ cds.once("served", async () => {
                         // Track the action parameters holding print configurations
                         await getAnnotatedParamsOfAction(boundAction);
                         const sourceentity = getQueueValueHelpEntity(boundAction.params);
+                        const printer = await cds.connect.to("print");
                         if(sourceentity && !queueValueHelpHandlerRegistered) {
-                            srv.after('READ', sourceentity, populateQueueValueHelp);
+                            srv.after('READ', sourceentity, async (_, req) => {
+                                // TODO: make sure the format of all services are the same
+                                const q = await printer.getQueues();
+
+                                q.forEach((item, index) => {
+                                    req.results[index] = { ID: item.ID };
+                                });
+                                req.results.$count = q.length;
+                                return;
+
+                            });
                         }
                         const actionName = boundAction.name.split('.').pop();
 
