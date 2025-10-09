@@ -14,7 +14,24 @@ cds.once("served", async () => {
     for (let srv of cds.services) {
         // Iterate over all entities in the service
         for (let entity of srv.entities) {
-            
+
+            if (entity.projection?.from.ref[0] === "sap.print.Queues") {
+                const printer = await cds.connect.to("print");
+
+                srv.after('READ', entity, async (_, req) => {
+                    // TODO: make sure the format of all services are the same
+                    const q = await printer.getQueues();
+
+                    q.forEach((item, index) => {
+                        req.results[index] = { ID: item.ID };
+                    });
+                    req.results.$count = q.length;
+                    return;
+
+                });
+
+            }
+
             // Track the fields holding print configurations
             await getFieldsHoldingPrintConfig(entity);
 
@@ -42,22 +59,8 @@ cds.once("served", async () => {
                     if(boundAction['@print']) {
                         
                         // Track the action parameters holding print configurations
-                        await getAnnotatedParamsOfAction(boundAction);
-                        const sourceentity = getQueueValueHelpEntity(boundAction.params);
-                        const printer = await cds.connect.to("print");
-                        if(sourceentity && !queueValueHelpHandlerRegistered) {
-                            srv.after('READ', sourceentity, async (_, req) => {
-                                // TODO: make sure the format of all services are the same
-                                const q = await printer.getQueues();
+                        getAnnotatedParamsOfAction(boundAction);
 
-                                q.forEach((item, index) => {
-                                    req.results[index] = { ID: item.ID };
-                                });
-                                req.results.$count = q.length;
-                                return;
-
-                            });
-                        }
                         const actionName = boundAction.name.split('.').pop();
 
                         // Register for print related handling
