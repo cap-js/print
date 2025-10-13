@@ -16,9 +16,16 @@ module.exports = class PrintToPrintService extends PrintService {
   /**
    * Get available print queues (dummy data for console mode)
    */
-  async getQueues() {
+  async getQueues(req) {
     // TODO: return the actual queues here as in printUtil.js
-    return [];
+    try{
+      const result = await populateQueueValueHelp(null, req)
+      return result;
+     }catch(err){
+       console.log(err, 'Feching queues failed')
+       return req.error(500, 'Failed to fetch queues');
+     }
+
   }
 
   /**
@@ -35,6 +42,12 @@ module.exports = class PrintToPrintService extends PrintService {
     LOG.info('===============================');
     
     // TODO: call actual print functions from printUtil.js
+    try{
+      const result = await print(null, printRequest)
+      console.log(result)
+     }catch(err){
+       console.log(err, 'Failed to create print tasks')
+     }
 
     return {
       status: 'success',
