@@ -48,18 +48,17 @@ module.exports = class PrintToConsole extends PrintService {
     if (docsToPrint && docsToPrint.length > 0) {
       docsToPrint.forEach((doc, index) => {
         LOG.info(`\nDocument ${index + 1}: ${doc.fileName}`);
-        LOG.info('-------------------------------');
-        
+        LOG.info('-------------------------------');        
         // Decode base64 content and display
-        const content = Buffer.from(doc.content, 'base64').toString('utf8');
-        console.log(content);
+        // const content = Buffer.from(doc.content, 'base64').toString('utf-8');
+        console.log(doc.content);
         
         LOG.info('-------------------------------\n');
       });
     }
     
     LOG.info(`Print job completed successfully!`);
-    LOG.info(`Sent to: ${selectedQueue.ID} (${selectedQueue.location})`);
+    LOG.info(`Sent to: ${selectedQueue}`);
     
     return {
       status: 'success',

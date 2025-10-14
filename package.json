@@ -47,6 +47,10 @@
           "destination": "SAP_Print_Service", 
           "kind": "print-to-service"
         },
+        "[hybrid]": {
+          "destination": "SAP_Print_Service", 
+          "kind": "print-to-service"
+        },
         "vcap": {
           "tag": "print"
         },
