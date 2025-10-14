@@ -48,8 +48,7 @@ module.exports = class PrintToConsole extends PrintService {
     if (docsToPrint && docsToPrint.length > 0) {
       docsToPrint.forEach((doc, index) => {
         LOG.info(`\nDocument ${index + 1}: ${doc.fileName}`);
-        LOG.info('-------------------------------');
-        
+        LOG.info('-------------------------------');        
         // Decode base64 content and display
         // const content = Buffer.from(doc.content, 'base64').toString('utf-8');
         console.log(doc.content);

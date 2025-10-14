@@ -1,5 +1,5 @@
 const PrintService = require('./service');
-const { print, populateQueueValueHelp } = require('../lib/printUtil');
+const { print, getQueues } = require('../lib/printUtil');
 const cds = require("@sap/cds");
 const LOG = cds.log('print');
 
@@ -17,9 +17,8 @@ module.exports = class PrintToPrintService extends PrintService {
    * Get available print queues (dummy data for console mode)
    */
   async getQueues(req) {
-    // TODO: return the actual queues here as in printUtil.js
     try{
-      const result = await populateQueueValueHelp(null, req)
+      const result = await getQueues(null, req)
       return result;
      }catch(err){
        console.log(err, 'Feching queues failed')
@@ -35,13 +34,7 @@ module.exports = class PrintToPrintService extends PrintService {
   async print(printRequest) {
     const { qname, numberOfCopies, docsToPrint } = printRequest;
     
-    LOG.info('===============================');
-    LOG.info(`Queue: ${qname || 'DEFAULT'}`);
-    LOG.info(`Copies: ${numberOfCopies || 1}`);
-    LOG.info(`Documents: ${docsToPrint?.length || 0}`);
-    LOG.info('===============================');
-    
-    // TODO: call actual print functions from printUtil.js
+    LOG.info(`Print request received for queue: ${qname}, copies: ${numberOfCopies}, documents: ${docsToPrint?.length || 0}`);   
     try{
       const result = await print(null, printRequest)
       console.log(result)
@@ -49,10 +42,5 @@ module.exports = class PrintToPrintService extends PrintService {
        console.log(err, 'Failed to create print tasks')
      }
 
-    return {
-      status: 'success',
-      message: `Print job sent to ${qname} for ${numberOfCopies} copies`,
-      taskId: `console-task-${Date.now()}`
-    };
   }
 }
