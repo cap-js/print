@@ -37,9 +37,23 @@ module.exports = class PrintToPrintService extends PrintService {
     LOG.info(`Print request received for queue: ${qname}, copies: ${numberOfCopies}, documents: ${docsToPrint?.length || 0}`);   
     try{
       const result = await print(null, printRequest)
-      console.log(result)
+      console.log(result);
+      
+      return {
+        status: 'success',
+        message: `Print job sent to ${qname} for ${numberOfCopies} copies`,
+        taskId: `console-task-${Date.now()}`,
+        details: result
+      };
      }catch(err){
-       console.log(err, 'Failed to create print tasks')
+      console.log(err, 'Failed to create print tasks');
+      
+      return {
+        status: 'error',
+        message: `Print job failed for queue ${qname}`,
+        error: err.message,
+        taskId: `failed-task-${Date.now()}`
+      };
      }
 
   }
