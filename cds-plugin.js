@@ -1,13 +1,9 @@
 const {
     getFieldsHoldingPrintConfig,
-    getAnnotatedParamsOfAction,
-    getQueueValueHelpEntity
+    getAnnotatedParamsOfAction
 } = require('./lib/annotation-helper');
 
-const {print, populateQueueValueHelp} = require('./lib/printUtil');
-
 const cds = require('@sap/cds');
-let queueValueHelpHandlerRegistered = false;
 
 cds.once("served", async () => {
     // Iterate over all services
@@ -19,29 +15,17 @@ cds.once("served", async () => {
                 const printer = await cds.connect.to("print");
 
                 srv.after('READ', entity, async (_, req) => {
-                    // TODO: make sure the format of all services are the same
                     const q = await printer.getQueues();
-
                     q.forEach((item, index) => {
                         req.results[index] = { ID: item.ID };
                     });
                     req.results.$count = q.length;
                     return;
-
                 });
-
             }
 
             // Track the fields holding print configurations
             await getFieldsHoldingPrintConfig(entity);
-
-            // ValueHelp entity handler
-            const sourceentity = getQueueValueHelpEntity(entity.elements);
-            if (sourceentity) {
-                // Register for print related handling
-                srv.after('READ', sourceentity, populateQueueValueHelp);
-                queueValueHelpHandlerRegistered = true;
-            }
 
             // Check if the entity has actions
             if (entity.actions) {
@@ -64,7 +48,10 @@ cds.once("served", async () => {
                         const actionName = boundAction.name.split('.').pop();
 
                         // Register for print related handling
-                        srv.after(actionName, print);
+                         const printer = await cds.connect.to("print");
+                        srv.after(actionName, async (results, req) => {
+                            return printer.print(req);
+                        });
                     }
                 }
             }
