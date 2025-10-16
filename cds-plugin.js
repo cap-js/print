@@ -1,7 +1,6 @@
 const {
     getFieldsHoldingPrintConfig,
-    getAnnotatedParamsOfAction,
-    getQueueValueHelpEntity
+    getAnnotatedParamsOfAction
 } = require('./lib/annotation-helper');
 
 const {print, populateQueueValueHelp} = require('./lib/printUtil');
@@ -27,21 +26,11 @@ cds.once("served", async () => {
                     });
                     req.results.$count = q.length;
                     return;
-
                 });
-
             }
 
             // Track the fields holding print configurations
             await getFieldsHoldingPrintConfig(entity);
-
-            // ValueHelp entity handler
-            const sourceentity = getQueueValueHelpEntity(entity.elements);
-            if (sourceentity) {
-                // Register for print related handling
-                srv.after('READ', sourceentity, populateQueueValueHelp);
-                queueValueHelpHandlerRegistered = true;
-            }
 
             // Check if the entity has actions
             if (entity.actions) {
@@ -64,7 +53,10 @@ cds.once("served", async () => {
                         const actionName = boundAction.name.split('.').pop();
 
                         // Register for print related handling
-                        srv.after(actionName, print);
+                        srv.after(actionName, async (results, req) => {
+                            const printer = await cds.connect.to("print");
+                            return printer.print(req);
+                        });
                     }
                 }
             }
