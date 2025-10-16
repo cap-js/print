@@ -3,10 +3,7 @@ const {
     getAnnotatedParamsOfAction
 } = require('./lib/annotation-helper');
 
-const {print, populateQueueValueHelp} = require('./lib/printUtil');
-
 const cds = require('@sap/cds');
-let queueValueHelpHandlerRegistered = false;
 
 cds.once("served", async () => {
     // Iterate over all services
@@ -18,9 +15,7 @@ cds.once("served", async () => {
                 const printer = await cds.connect.to("print");
 
                 srv.after('READ', entity, async (_, req) => {
-                    // TODO: make sure the format of all services are the same
                     const q = await printer.getQueues();
-
                     q.forEach((item, index) => {
                         req.results[index] = { ID: item.ID };
                     });
