@@ -48,8 +48,8 @@ cds.once("served", async () => {
                         const actionName = boundAction.name.split('.').pop();
 
                         // Register for print related handling
+                         const printer = await cds.connect.to("print");
                         srv.after(actionName, async (results, req) => {
-                            const printer = await cds.connect.to("print");
                             return printer.print(req);
                         });
                     }
