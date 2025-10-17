@@ -90,11 +90,12 @@ describe('PrintToPrintService', () => {
       numberOfCopies: 3,
       docsToPrint: [{ fileName: 'doc.pdf', content: 'BASE64DATA' }]
     };
+    const req = { printRequest };
     const utilResult = { status: 'SUCCESS', queue: 'PRN_MAIN' };
     mockPrintUtilPrint.mockResolvedValue(utilResult);
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-    const result = await svc.print(printRequest);
+    const result = await svc.print(req);
 
     expect(mockPrintUtilPrint).toHaveBeenCalledWith(null, printRequest);
     expect(consoleSpy).toHaveBeenCalledWith(utilResult);
@@ -109,7 +110,8 @@ describe('PrintToPrintService', () => {
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     const printRequest = { qname: 'PRN_FAIL', numberOfCopies: 2, docsToPrint: [] };
-    const result = await svc.print(printRequest);
+    const req = { printRequest };
+    const result = await svc.print(req);
 
     // util error logged via console.log(err, 'Failed to create print tasks')
     expect(consoleSpy).toHaveBeenCalledWith(err, 'Failed to create print tasks');

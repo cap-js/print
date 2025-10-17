@@ -83,4 +83,13 @@ describe('PrintService (service.js)', () => {
     svc.print('AliasEvent', msg);
     expect(spy).toHaveBeenCalledWith('AliasEvent', msg);
   });
+
+  test('emit() with no arguments logs warning and returns undefined', () => {
+    const svc = new PrintService();
+    const ret = svc.emit();
+    expect(cds._logger.warn).toHaveBeenCalledWith('No object provided for print');
+    expect(ret).toBeUndefined();
+    expect(cds._emitMock).not.toHaveBeenCalled();
+  });
+
 });

@@ -31,7 +31,10 @@ module.exports = class PrintToPrintService extends PrintService {
    * Print method that prints to real printer via REST API
    * This is called when printer.print() is invoked from other services
    */
-  async print(printRequest) {
+  async print(req) {
+    let printRequest = req.printRequest;
+    // console.log(req);
+    // console.log(req.printRequest);
     const { qname, numberOfCopies, docsToPrint } = printRequest;
     
     LOG.info(`Print request received for queue: ${qname}, copies: ${numberOfCopies}, documents: ${docsToPrint?.length || 0}`);   

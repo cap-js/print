@@ -27,32 +27,32 @@ module.exports = class PrintToConsole extends PrintService {
    * Print method that outputs to console instead of real printer
    * This is called when printer.print() is invoked from other services
    */
-  async print(printRequest) {
+  async print(req) {
+
+    let printRequest = req.printRequest;
+
     const { qname, numberOfCopies, docsToPrint } = printRequest;
 
-    LOG.info('Received print request:', JSON.stringify(printRequest));
+    // LOG.info('Received print request:', JSON.stringify(printRequest));
     
     // Get available queues and validate the selected queue
-    const availableQueues = await this.getQueues();
+    // const availableQueues = await this.getQueues();
     const selectedQueue = printRequest.qname
 
-    LOG.info('===============================');
-    LOG.info(`PRINT JOB DETAILS`);
-    LOG.info('===============================');
-    LOG.info(`Queue ID: ${selectedQueue}`);
-    LOG.info(`Copies: ${numberOfCopies}`);
-    LOG.info(`Documents: ${docsToPrint?.length || 0}`);
-    LOG.info('===============================');
+    // LOG.info('===============================');
+    // LOG.info(`PRINT JOB DETAILS`);
+    // LOG.info('===============================');
+    // LOG.info(`Queue ID: ${selectedQueue}`);
+    // LOG.info(`Copies: ${numberOfCopies}`);
+    // LOG.info(`Documents: ${docsToPrint?.length || 0}`);
+    // LOG.info('===============================');
     
     // Print each document content to console
     if (docsToPrint && docsToPrint.length > 0) {
       docsToPrint.forEach((doc, index) => {
-        LOG.info(`\nDocument ${index + 1}: ${doc.fileName}`);
+        LOG.info(`Document ${index + 1}: ${doc.fileName}`);
         LOG.info('-------------------------------');        
-        // Decode base64 content and display
-        // const content = Buffer.from(doc.content, 'base64').toString('utf-8');
-        console.log(doc.content);
-        
+        console.log(doc.content.substring(0, 200) + "...");
         LOG.info('-------------------------------\n');
       });
     }

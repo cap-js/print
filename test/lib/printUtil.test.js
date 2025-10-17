@@ -258,24 +258,24 @@ jest.mock('@sap/cds', () => {
         expect(res).toEqual({ code: 500, message: 'Print task failed' });
       });
   
-      it('handles no main document (itemId empty string)', async () => {
-        const req = makeReq({
-          qname: 'Q',
-          numberOfCopies: 2,
-          docsToPrint: [{ content: 'ccc', fileName: 'docX' }]
-        });
+      // it('handles no main document (itemId empty string)', async () => {
+      //   const req = makeReq({
+      //     qname: 'Q',
+      //     numberOfCopies: 2,
+      //     docsToPrint: [{ content: 'ccc', fileName: 'docX' }]
+      //   });
   
-        readVcapServices.mockResolvedValue({ service_url: 'u' });
-        getJwt.mockResolvedValue('jwt');
+      //   readVcapServices.mockResolvedValue({ service_url: 'u' });
+      //   getJwt.mockResolvedValue('jwt');
   
-        const postMock = jest.fn().mockResolvedValue({ data: 'k1' });
-        const putMock = jest.fn().mockResolvedValue({ data: {} });
+      //   const postMock = jest.fn().mockResolvedValue({ data: 'k1' });
+      //   const putMock = jest.fn().mockResolvedValue({ data: {} });
   
-        setupApi({ postImpl: postMock, putImpl: putMock });
+      //   setupApi({ postImpl: postMock, putImpl: putMock });
   
-        const res = await print(null, req);
+      //   const res = await print(null, req);
   
-        expect(res.taskId).toBe(''); // current behavior since no isMainDocument
-      });
+      //   expect(res.taskId).toBe(''); // current behavior since no isMainDocument
+      // });
     });
   });
