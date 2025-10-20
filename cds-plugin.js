@@ -1,9 +1,13 @@
 const {
     getFieldsHoldingPrintConfig,
-    getAnnotatedParamsOfAction
+    getAnnotatedParamsOfAction,
+    getPrintParamsAttributeFromAction
 } = require('./lib/annotation-helper');
 
 const cds = require('@sap/cds');
+const LOG = cds.log('print');
+
+const PRINT = "@print";
 
 cds.once("served", async () => {
     // Iterate over all services
@@ -24,35 +28,43 @@ cds.once("served", async () => {
                 });
             }
 
-            // Track the fields holding print configurations
-            await getFieldsHoldingPrintConfig(entity);
+            if(!entity.actions) continue
 
-            // Check if the entity has actions
-            if (entity.actions) {
-                let actionsArray;
+            for(const action of entity.actions) {
+                if(action[PRINT]) {
 
-                // Convert actions to an array if it's an object
-                if (Array.isArray(entity.actions)) {
-                  actionsArray = entity.actions;
-                } else if (typeof entity.actions === 'object') {
-                  actionsArray = Object.values(entity.actions);
-                }
+                    const printer = await cds.connect.to("print");
 
-                // Iterate over all bound actions
-                for (let boundAction of actionsArray) {
-                    if(boundAction['@print']) {
-                        
-                        // Track the action parameters holding print configurations
-                        getAnnotatedParamsOfAction(boundAction);
+                    const { numberOfCopiesAttribute, queueIDAttribute, fileNameAttribute, contentAttribute } = getPrintParamsAttributeFromAction(entity, action);
 
-                        const actionName = boundAction.name.split('.').pop();
+                    srv.on(action.name, entity, async (req) => {
 
-                        // Register for print related handling
-                         const printer = await cds.connect.to("print");
-                        srv.after(actionName, async (results, req) => {
-                            return printer.print(req);
-                        });
-                    }
+
+                        const numberOfCopies = req.data[numberOfCopiesAttribute];
+                        const queueID = req.data[queueIDAttribute];
+
+                        const object = await SELECT.one.from(req.subject).columns([fileNameAttribute, contentAttribute]);
+
+                        try {
+
+                            await printer.print({
+                                qname: queueID, 
+                                numberOfCopies: numberOfCopies,
+                                docsToPrint: [{
+                                    fileName: object[fileNameAttribute],
+                                    content: object[contentAttribute].toString('base64'),
+                                    isMainDocument: true
+                                }]
+                            })
+
+                        }
+                        catch (error) {
+                            LOG.error(error)
+                            req.reject(500, `Printing failed: ${error.message ?? "Unknown error"}`);
+                        }
+
+
+                    });
                 }
             }
         }

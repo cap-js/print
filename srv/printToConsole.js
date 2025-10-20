@@ -50,8 +50,9 @@ module.exports = class PrintToConsole extends PrintService {
         LOG.info(`\nDocument ${index + 1}: ${doc.fileName}`);
         LOG.info('-------------------------------');        
         // Decode base64 content and display
+        // Add following lines to show Base64
         // const content = Buffer.from(doc.content, 'base64').toString('utf-8');
-        console.log(doc.content);
+        // console.log({ content });
         
         LOG.info('-------------------------------\n');
       });
