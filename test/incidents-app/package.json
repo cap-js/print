@@ -1,0 +1,19 @@
+{
+  "name": "@capire/incidents",
+  "version": "1.0.0",
+  "dependencies": {
+    "@sap/cds": ">=8",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/print": "file:../../."
+  },
+  "scripts": {
+    "watch": "cds watch",
+    "watch:hybrid": "cds watch --profile hybrid"
+  },
+  "sapux": [
+    "app/incidents"
+  ],
+  "private": true
+}
