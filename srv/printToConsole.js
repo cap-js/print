@@ -28,13 +28,12 @@ module.exports = class PrintToConsole extends PrintService {
    * This is called when printer.print() is invoked from other services
    */
   async print(printRequest) {
-    const { qname, numberOfCopies, docsToPrint } = printRequest;
+    const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
 
     LOG.info('Received print request:', JSON.stringify(printRequest));
     
     // Get available queues and validate the selected queue
     const availableQueues = await this.getQueues();
-    const selectedQueue = printRequest.qname
 
     LOG.info('===============================');
     LOG.info(`PRINT JOB DETAILS`);
