@@ -1,8 +1,7 @@
-const cds = require('@sap/cds');
-const LOG = cds.log('print');
+const cds = require("@sap/cds");
+const LOG = cds.log("print");
 
 class PrintService extends cds.Service {
-
   /**
    * Sends a document to print. Method print can be used alternatively.
    * @param {string} [event] - The print action event.
@@ -10,7 +9,7 @@ class PrintService extends cds.Service {
    */
   emit(event, message) {
     if (!event) {
-      LOG._warn && LOG.warn('No object provided for print');
+      LOG._warn && LOG.warn("No object provided for print");
       return;
     }
     // Outbox calls us with a req object, e.g. { event, data, headers }
@@ -19,7 +18,7 @@ class PrintService extends cds.Service {
     if (!message) [message, event] = [event];
     // CAP events translate to print actions and vice versa
     if (event) message.action = event;
-    else event = message.action || message.ActionKey || 'Default';
+    else event = message.action || message.ActionKey || "Default";
     // Emit the print request
     return super.emit(event, message);
   }
@@ -40,7 +39,6 @@ class PrintService extends cds.Service {
     throw new Error('getQueues method must be implemented by subclass');
   }
    */
-
 }
 
 module.exports = PrintService;
@@ -48,7 +46,7 @@ module.exports = PrintService;
 // Without Generic Outbox only alert.print() can be used, not alert.emit()
 // Remove that when @sap/cds with Generic Outbox is released
 if (!cds.outboxed) {
-  class OutboxedNotificationService extends require('@sap/cds/libx/_runtime/messaging/Outbox') {}
-  OutboxedNotificationService.prototype.notify = NotificationService.prototype.emit
-  module.exports = OutboxedNotificationService
+  class OutboxedNotificationService extends require("@sap/cds/libx/_runtime/messaging/Outbox") {}
+  OutboxedNotificationService.prototype.notify = NotificationService.prototype.emit;
+  module.exports = OutboxedNotificationService;
 }

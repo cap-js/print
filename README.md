@@ -23,8 +23,8 @@ Usage of this plugin requires a valid subscription of the [SAP Print Service](ht
 To use this plugin to print documents there are two main steps:
 
 1. Add required annotations to your CDS model.
-    a. Entity
-    b. Action
+   a. Entity
+   b. Action
 2. Configure print queues to select from available options. (Optional, but recommended)
 
 ### Annotations in CDS model
@@ -47,6 +47,7 @@ entity Incidents : cuid {
 - `@print.fileName`: Annotates the field containing the name of the document
 
 #### Annotation of actions
+
 Sending a print request works via bound actions annotated with `@print`. The parameter of the action are used to define the print job details.
 
 ```cds
@@ -72,7 +73,7 @@ service IncidentService {
           qnameID: String,
           @print.numberOfCopies
           @UI.ParameterDefaultValue : 1
-          copies: Integer 
+          copies: Integer
       );
     };
 }
@@ -82,7 +83,8 @@ service IncidentService {
 - `@print.queue`: Annotates the parameter specifying the print queue. It is recommended to use a value help for this parameter to select from available print queues. See TOOD
 - `@print.numberOfCopies`: Annotates the parameter specifying the number of copies to print
 
-### Queues 
+### Queues
+
 Every print request needs to specify a print queue it is send to. It is recommended to provide a value help for the print queue selection. To enbale this, define an entity as projection on the `Queues` entity provided by the print service. When this projection is in place, the plugin automatically provides the available print queues coming from the print service.
 
 ```cds

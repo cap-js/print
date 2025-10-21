@@ -36,7 +36,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Fixed handling of unmanaged composition of many
 - Proper casing of the operation enum type
 
-
 ### Changed
 
 - Added warning and mitigation for multi-tenant deployments with MTX
@@ -44,21 +43,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Changed the default limit on non-HANA databases from 255 to 5000 characters for all String values
 - Updated peer dependency from CDS7 to CDS8
 
-
 ## Version 1.0.7 - 20.08.24
 
 ### Added
 
- - A global switch to preserve change logs for deleted data
- - For hierarchical entities, a method to determine their structure and a flag to indicate whether it is a root entity was introduced. For child entities, information about the parent is recorded.
-
+- A global switch to preserve change logs for deleted data
+- For hierarchical entities, a method to determine their structure and a flag to indicate whether it is a root entity was introduced. For child entities, information about the parent is recorded.
 
 ### Fixed
 
 - CDS 8 does not support queries for draft-enabled entities on the application service anymore. This was causing: SqliteError: NOT NULL constraint failed: (...).DraftAdministrativeData_DraftUUID
 - CDS 8 deprecated cds.transaction, causing change logs of nested documents to be wrong, replaced with req.event
 - CDS 8 rejects all direct CRUD requests for auto-exposed Compositions in non-draft cases. This was affecting test cases, since the ChangeView falls into this category
-- req._params and req.context are not official APIs and stopped working with CDS 8, replaced with official APIs
+- req.\_params and req.context are not official APIs and stopped working with CDS 8, replaced with official APIs
 - When running test cases in CDS 8, some requests failed with a status code of 404
 - ServiceEntity is not captured in the ChangeLog table in some cases
 - When modeling an inline entity, a non-existent association and parent ID was recorded
@@ -70,22 +67,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Data marked as personal data using data privacy annotations won't get change-tracked anymore to satisfy product standards
 - Restructured Documentation
 
-
 ## Version 1.0.6 - 29.04.24
 
 ### Fixed
 
- -  Storage of wrong ObjectID in some special scenarios
- -  Missing localization of managed fields
- -  Views without keys won't get the association and UI facet pushed anymore
+- Storage of wrong ObjectID in some special scenarios
+- Missing localization of managed fields
+- Views without keys won't get the association and UI facet pushed anymore
 
 ### Added
 
- - A method to disable automatic generation of the UI Facet
+- A method to disable automatic generation of the UI Facet
 
 ### Changed
 
- - Improved documentation of the @changelog Annotation
+- Improved documentation of the @changelog Annotation
 
 ## Version 1.0.5 - 15.01.24
 
@@ -112,7 +108,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Added
 
-- Added note about using `SAPUI5 v1.120.0` or later for proper lazy loading of the *Change History* table.
+- Added note about using `SAPUI5 v1.120.0` or later for proper lazy loading of the _Change History_ table.
 - In README, add warning about tracking personal data.
 
 ### Changed
@@ -141,4 +137,3 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Added
 
 - Initial release
-
