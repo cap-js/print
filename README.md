@@ -99,19 +99,11 @@ service IncidentService {
 
 When running the application locally, i.e. `cds watch`, the print service is mocked. This mock implementation prints the print job details to the console instead of sending it to the actual print service. It also provides a number of sample print queues for selection.
 
-You can also run the application locally with a binding to the cloud print service with CAP profiles. For more information, see [Hybrid Testing](https://cap.cloud.sap/docs/advanced/hybrid-testing#hybrid-testing).
+## Hybrid Testing
 
-## Note
+You can also run the application locally with a binding to the cloud print service with CAP profiles. For more information, see [Hybrid Testing](https://cap.cloud.sap/docs/advanced/hybrid-testing#hybrid-testing). You need an instance of the SAP Print Service.
 
-If you are running the application in a production way locally(E.g. adding VCAP_SERVICES in `default-env.json`), add the environmental variable `SUBSCRIBER_SUBDOMAIN_FOR_LOCAL_TESTING=<Your subscriber subdomain name>` in the `package.json` as shown below.
-
-#### Example
-
-```json
-"scripts": {
-    "start": "SUBSCRIBER_SUBDOMAIN_FOR_LOCAL_TESTING=sub01 cds-serve"
-}
-```
+TODO: More doc about setting up the print service
 
 ## Support, Feedback, Contributing
 
