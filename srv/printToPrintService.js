@@ -53,8 +53,8 @@ const getDestination = async () => {
       return transformServiceBindingToClientCredentialsDestination(
         Object.assign(service, {
           credentials: service.credentials.uaa,
-          url: "https://api.eu12.print.services.sap",
-        }), // TODO: make dynamic
+          url: service.credentials.service_url,
+        }),
         options,
       );
     },
