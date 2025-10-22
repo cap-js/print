@@ -22,8 +22,8 @@
   "dependencies": {
     "@cap-js/print": "file:",
     "@sap-cloud-sdk/connectivity": "^3.26.4",
-    "@sap/xssec": "^3.6.2",
-    "axios": "^1.8.4"
+    "@sap-cloud-sdk/http-client": "^4.1.2",
+    "@sap/xssec": "^3.6.2"
   },
   "peerDependencies": {
     "@sap/cds": "^8"
@@ -44,11 +44,11 @@
           "kind": "print-to-console"
         },
         "[production]": {
-          "destination": "SAP_Print_Service", 
+          "destination": "SAP_Print_Service",
           "kind": "print-to-service"
         },
         "[hybrid]": {
-          "destination": "SAP_Print_Service", 
+          "destination": "SAP_Print_Service",
           "kind": "print-to-service"
         },
         "vcap": {
@@ -70,6 +70,10 @@
     "test": "jest --coverage --config jest.config.js",
     "integration-test": "jest --config jest-integration.config.js",
     "lint": "npx eslint --fix . --no-cache",
-    "in-cap-dev": "cd node_modules && rm -fr @sap/cds* @cap-js/db-service @cap-js/sqlite"
+    "in-cap-dev": "cd node_modules && rm -fr @sap/cds* @cap-js/db-service @cap-js/sqlite",
+    "prettier": "npx -y prettier@3 --write .",
+    "prettier:check": "npx -y prettier@3 --check .",
+    "watch-sample": "cd test/incidents-app && cds watch",
+    "watch-sample:hybrid": "cd test/incidents-app && cds watch --profile hybrid"
   }
 }

@@ -18,138 +18,92 @@ See [Getting Started](https://cap.cloud.sap/docs/get-started) on how to jumpstar
 
 Usage of this plugin requires a valid subscription of the [SAP Print Service](https://help.sap.com/docs/SCP_PRINT_SERVICE).
 
-To integrate the print functionality in your application, simply annotate any action with `@print`. This annotation automatically manages the process of sending documents to the print queues, requiring no additional setup for handling print jobs.
+## Usage
 
-### Required Fields
+To use this plugin to print documents there are two main steps:
 
-The following three fields should be annotated with the corresponding `@print` annotations:
+1. Add required annotations to your CDS model:
+   a. Entity
+   b. Action
+2. Configure print queues to select from available options. (Optional, but recommended)
 
-1. **`@print.queue`**: Specifies the queue to which the document should be sent for printing.
-2. **`@print.numberOfCopies`**: Defines the number of copies to be printed.
-3. **`@print.fileContent`**: Provides the file content to be printed. You can also specify the file name using the `fileNameField` property.
+### Annotations in CDS model
 
-#### Example
+#### Entity
+
+First of all, the entity needs to be annotated to define the content and the name of the document to be printed.
 
 ```cds
-@print.fileContent: {
-    fileNameField: '<Field Name>',
+entity Incidents : cuid {
+  @print.fileContent
+  file : LargeBinary @Core.MediaType: 'application/pdf';
+  @print.fileName
+  fileName : String;
 }
+
 ```
 
-Multiple fields can be annotated with `@print.fileContent` to send several documents to the print queue in a single action.
+- `@print.fileContent`: Annotates the field containing the document content to be printed.
+- `@print.fileName`: Annotates the field containing the name of the document
 
-### Main Document
+#### Annotation of actions
 
-To designate a specific document as the primary document for printing, annotate it with `@print.MainDocument`:
-
-```cds
-@print.MainDocument
-invoiceContent,
-```
-
-This ensures the specified document is treated as the main document when multiple documents are involved.
-
-## Print Queue Configuration
-
-You can retrieve all available print queues from the Print Service Application for selection by defining a `Queues` entity with **skip persistency**. This setup will offer a value help for the print queues, allowing users to select from available options.
-
-### Define the `Queues` Entity
-
-Define an entity like `Product` and associate it with the `Queues` entity as shown below:
-
-#### Example
-```cds
-entity Product {
-    qName : Association to one Queues;
-}
-
-@cds.skip.persistence
-entity Queues {
-    key ID          : String;
-        description : String;
-}
-```
-
-#### Annotating with `@print.queue`
-
-Once the `Queues` entity is defined, specify it in the `@print.queue` annotation like so:
+Sending a print request works via bound actions annotated with `@print`. The parameter of the action are used to define the print job details.
 
 ```cds
-@print.queue: {
-    SourceEntity: 'Queues'
-}
-qName
-```
+service IncidentService {
+    entity Incidents as projection on db.Incidents actions {
 
-### Parameterizing Print Queue in Actions
-
-Alternatively, if the print queue is passed as a parameter in the action, you can annotate it directly within the action definition. This can be done as follows:
-
-#### In Database Definition:
-
-```cds
-entity Product {
-    qName : Association to one Queues;
-}
-
-@cds.skip.persistence
-entity Queues {
-    key ID          : String;
-        description : String;
-}
-```
-
-#### In Service Definition:
-
-```cds
-service MyService {
     @print
-    action print(
-        @print.queue: {
-            SourceEntity: 'Queues'
-        }
-        @Common: {
-            ValueListWithFixedValues,
-            ValueList: {
-                $Type: 'Common.ValueListType',
-                CollectionPath: 'Queues',
-                Parameters: [{
-                    $Type: 'Common.ValueListParameterInOut',
-                    LocalDataProperty: qnameID,
-                    ValueListProperty: 'ID'
-                }]
-            },
-            Label: 'Print Queues',
-        }
-        qnameID: String
-    );
-
-    entity Queues as projection on db.Queues;
+    action printIncidentFile(
+          @Common: {
+              ValueListWithFixedValues,
+              ValueList: {
+                  $Type: 'Common.ValueListType',
+                  CollectionPath: 'Queues',
+                  Parameters: [{
+                      $Type: 'Common.ValueListParameterInOut',
+                      LocalDataProperty: qnameID,
+                      ValueListProperty: 'ID'
+                  }]
+              },
+              Label: 'Print Queues',
+          }
+          @print.queue
+          qnameID: String,
+          @print.numberOfCopies
+          @UI.ParameterDefaultValue : 1
+          copies: Integer
+      );
+    };
 }
 ```
 
-In this setup, the `qnameID` parameter will be used to dynamically select the print queue from the `Queues` entity. The `Common.ValueList` provides a drop-down selection for available queues during runtime.
+- `@print`: Annotates the action that triggers the print job.
+- `@print.queue`: Annotates the parameter specifying the print queue. It is recommended to use a value help for this parameter to select from available print queues. See TOOD
+- `@print.numberOfCopies`: Annotates the parameter specifying the number of copies to print
 
+### Queues
 
-## Note
+Every print request needs to specify a print queue it is send to. It is recommended to provide a value help for the print queue selection. To enbale this, define an entity as projection on the `Queues` entity provided by the print service. When this projection is in place, the plugin automatically provides the available print queues coming from the print service.
 
-If you are running the application in a production way locally(E.g. adding VCAP_SERVICES in `default-env.json`), add the environmental variable `SUBSCRIBER_SUBDOMAIN_FOR_LOCAL_TESTING=<Your subscriber subdomain name>` in the `package.json` as shown below.
+```cds
+using {sap.print as sp} from '@cap-js/print';
 
-#### Example
-
-```json
-"scripts": {
-    "start": "SUBSCRIBER_SUBDOMAIN_FOR_LOCAL_TESTING=sub01 cds-serve"
+service IncidentService {
+    entity Queues as projection on sp.Queues;
 }
 ```
 
-If you are running the application in offline mode which is without remote connection to the online environment, you can add the environmental variable `PRINT_CONSOLE_MODE=true cds watch` in the `package.json` as shown below.
+## Local Development
 
-```json
-"scripts": {
-    "watch-offline": "PRINT_CONSOLE_MODE=true cds watch"
-}
-```
+When running the application locally, i.e. `cds watch`, the print service is mocked. This mock implementation prints the print job details to the console instead of sending it to the actual print service. It also provides a number of sample print queues for selection.
+
+## Hybrid Testing
+
+You can also run the application locally with a binding to the cloud print service with CAP profiles. For more information, see [Hybrid Testing](https://cap.cloud.sap/docs/advanced/hybrid-testing#hybrid-testing). You need an instance of the SAP Print Service.
+
+TODO: More doc about setting up the print service
 
 ## Support, Feedback, Contributing
 

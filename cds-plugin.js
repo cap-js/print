@@ -1,60 +1,105 @@
-const {
-    getFieldsHoldingPrintConfig,
-    getAnnotatedParamsOfAction
-} = require('./lib/annotation-helper');
+const cds = require("@sap/cds");
+const LOG = cds.log("print");
 
-const cds = require('@sap/cds');
+const PRINT = "@print";
+const PRINT_NUMBER_OF_COPIES = "@print.numberOfCopies";
+const PRINT_QUEUE = "@print.queue";
+const PRINT_FILE_NAME = "@print.fileName";
+const PRINT_FILE_CONTENT = "@print.fileContent";
+
+const QUEUE_ENTITY_NAME = "sap.print.Queues";
 
 cds.once("served", async () => {
-    // Iterate over all services
-    for (let srv of cds.services) {
-        // Iterate over all entities in the service
-        for (let entity of srv.entities) {
+  // Iterate over all services
+  for (let srv of cds.services) {
+    // Iterate over all entities in the service
+    for (let entity of srv.entities) {
+      if (entity.projection?.from.ref[0] === QUEUE_ENTITY_NAME) {
+        const printer = await cds.connect.to("print");
 
-            if (entity.projection?.from.ref[0] === "sap.print.Queues") {
-                const printer = await cds.connect.to("print");
+        srv.after("READ", entity, async (_, req) => {
+          const q = await printer.getQueues();
+          q.forEach((item, index) => {
+            req.results[index] = { ID: item.ID };
+          });
+          req.results.$count = q.length;
+          return;
+        });
+      }
 
-                srv.after('READ', entity, async (_, req) => {
-                    const q = await printer.getQueues();
-                    q.forEach((item, index) => {
-                        req.results[index] = { ID: item.ID };
-                    });
-                    req.results.$count = q.length;
-                    return;
-                });
+      if (!entity.actions) continue;
+
+      for (const action of entity.actions) {
+        if (action[PRINT]) {
+          const printer = await cds.connect.to("print");
+
+          const { numberOfCopiesAttribute, queueIDAttribute, fileNameAttribute, contentAttribute } =
+            getPrintParamsAttributeFromAction(entity, action);
+
+          srv.on(action.name, entity, async (req) => {
+            const numberOfCopies = req.data[numberOfCopiesAttribute];
+            const queueID = req.data[queueIDAttribute];
+
+            const object = await SELECT.one
+              .from(req.subject)
+              .columns([fileNameAttribute, contentAttribute]);
+
+            if (!object) return req.reject(404, `Object not found for printing.`);
+            if (!numberOfCopies)
+              return req.reject(400, `Please specify number of copies to print.`);
+            if (!queueID) return req.reject(400, `Please specify print queue.`);
+
+            const streamToBase64 = async (stream) => {
+              const chunks = [];
+              for await (const chunk of stream) {
+                chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+              }
+              return Buffer.concat(chunks).toString("base64");
+            };
+            try {
+              await printer.print({
+                qname: queueID,
+                numberOfCopies: numberOfCopies,
+                docsToPrint: [
+                  {
+                    fileName: object[fileNameAttribute],
+                    content: await streamToBase64(object[contentAttribute]),
+                    isMainDocument: true,
+                  },
+                ],
+              });
+
+              return req.info({
+                status: 200,
+                message: `Print job for file ${object[fileNameAttribute]} sent to queue ${queueID} for ${numberOfCopies} copies.`,
+              });
+            } catch (error) {
+              return req.reject(500, `Error: ${error.message ?? "Unknown error"}`);
             }
-
-            // Track the fields holding print configurations
-            await getFieldsHoldingPrintConfig(entity);
-
-            // Check if the entity has actions
-            if (entity.actions) {
-                let actionsArray;
-
-                // Convert actions to an array if it's an object
-                if (Array.isArray(entity.actions)) {
-                  actionsArray = entity.actions;
-                } else if (typeof entity.actions === 'object') {
-                  actionsArray = Object.values(entity.actions);
-                }
-
-                // Iterate over all bound actions
-                for (let boundAction of actionsArray) {
-                    if(boundAction['@print']) {
-                        
-                        // Track the action parameters holding print configurations
-                        getAnnotatedParamsOfAction(boundAction);
-
-                        const actionName = boundAction.name.split('.').pop();
-
-                        // Register for print related handling
-                         const printer = await cds.connect.to("print");
-                        srv.after(actionName, async (results, req) => {
-                            return printer.print(req);
-                        });
-                    }
-                }
-            }
+          });
         }
+      }
     }
+  }
 });
+
+function getPrintParamsAttributeFromAction(entity, action) {
+  const copiesElement = Object.values(action.params).find((el) => el[PRINT_NUMBER_OF_COPIES]);
+  const queueElement = Object.values(action.params).find((el) => el[PRINT_QUEUE]);
+
+  const fileName = Object.values(entity.elements).find((el) => el[PRINT_FILE_NAME]);
+  const content = Object.values(entity.elements).find((el) => el[PRINT_FILE_CONTENT]);
+
+  if ((!copiesElement || !queueElement, !fileName || !content)) {
+    cds.error(
+      `Print action ${action.name} is missing required annotations. Make sure @print.numberOfCopies, @print.queue are present in the action and @print.fileName and @print.fileContent are present in the entity.`,
+    );
+  }
+
+  return {
+    numberOfCopiesAttribute: copiesElement.name,
+    queueIDAttribute: queueElement.name,
+    fileNameAttribute: fileName.name,
+    contentAttribute: content.name,
+  };
+}
