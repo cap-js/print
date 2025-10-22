@@ -15,5 +15,24 @@
   "sapux": [
     "app/incidents"
   ],
-  "private": true
+  "private": true,
+  "cds": {
+    "requires": {
+      "[hybrid]": {
+        "print-service": {
+          "binding": {
+            "type": "cf",
+            "apiEndpoint": "https://api.cf.eu12.hana.ondemand.com",
+            "org": "cdsruntime",
+            "space": "playground-sirsimon",
+            "instance": "print-service",
+            "key": "print-sender"
+          },
+          "vcap": {
+            "name": "print-service"
+          }
+        }
+      }
+    }
+  }
 }
