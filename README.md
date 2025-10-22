@@ -22,7 +22,7 @@ Usage of this plugin requires a valid subscription of the [SAP Print Service](ht
 
 To use this plugin to print documents there are two main steps:
 
-1. Add required annotations to your CDS model.
+1. Add required annotations to your CDS model:
    a. Entity
    b. Action
 2. Configure print queues to select from available options. (Optional, but recommended)
