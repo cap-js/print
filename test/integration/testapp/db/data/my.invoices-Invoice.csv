@@ -1,5 +1,0 @@
-ID;InvoiceNumber;fileName;qName_ID;numberOfCopies;attachmentName
-d990b3a2-550a-4dc2-bbcb-e77a29910479;343;Invoice_343.pdf;PrintingQ;3;343_1.pdf
-9d49000b-420a-4b6b-a6c8-7e6b6ed2111d;344;Invoice_344.pdf;InvoiceQueue;6;344_ab.pdf
-495b6c06-847a-4938-b6f1-e03ffacc8904;345;Invoice_345.pdf;PrintingQ;4;345_c.pdf
-fc371909-4a00-4863-91e4-b43d8790587a;346;Invoice_346.pdf;Test;4;346_a.pdf
