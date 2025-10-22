@@ -44,11 +44,9 @@
           "kind": "print-to-console"
         },
         "[production]": {
-          "destination": "SAP_Print_Service",
           "kind": "print-to-service"
         },
         "[hybrid]": {
-          "destination": "SAP_Print_Service",
           "kind": "print-to-service"
         },
         "vcap": {
@@ -58,10 +56,10 @@
       },
       "kinds": {
         "print-to-console": {
-          "impl": "@cap-js/print/srv/printToConsole"
+          "impl": "@cap-js/print/lib/printToConsole"
         },
         "print-to-service": {
-          "impl": "@cap-js/print/srv/printToPrintService"
+          "impl": "@cap-js/print/lib/printToPrintService"
         }
       }
     }
