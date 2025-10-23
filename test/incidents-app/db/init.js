@@ -47,12 +47,17 @@ module.exports = async function () {
     },
   ];
 
-  for (const incident of newIncidents) {
-    await INSERT.into(Incidents).entries({
-      ...incident,
-      file: templatePDF,
-      fileName: `Incident_${incident.ID}_Report.pdf`,
-    });
-    console.log(`Inserted incident ${incident.ID}: ${incident.title}`);
-  }
+  const insertPromises = newIncidents.map((incident) =>
+    INSERT.into(Incidents)
+      .entries({
+        ...incident,
+        file: templatePDF,
+        fileName: `Incident_${incident.ID}_Report.pdf`,
+      })
+      .then(() => {
+        console.log(`Inserted incident ${incident.ID}: ${incident.title}`);
+      }),
+  );
+
+  await Promise.all(insertPromises);
 };

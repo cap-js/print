@@ -18,8 +18,9 @@ cds.once("served", async () => {
         queueEntities.push(entity);
       }
       if (queueEntities.length > 0) {
+        // Can be disables as it is cached by CAP
+        // eslint-disable-next-line no-await-in-loop
         const printer = await cds.connect.to("print");
-
         srv.after("READ", queueEntities, async (_, req) => {
           const q = await printer.getQueues();
           q.forEach((item, index) => {
@@ -34,11 +35,11 @@ cds.once("served", async () => {
 
       for (const action of entity.actions) {
         if (action[PRINT]) {
-          const printer = await cds.connect.to("print");
-
           const { numberOfCopiesAttribute, queueIDAttribute, fileNameAttribute, contentAttribute } =
             getPrintParamsAttributeFromAction(entity, action);
 
+          // eslint-disable-next-line no-await-in-loop
+          const printer = await cds.connect.to("print");
           srv.on(action.name, entity, async (req) => {
             const numberOfCopies = req.data[numberOfCopiesAttribute];
             const queueID = req.data[queueIDAttribute];
