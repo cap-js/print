@@ -1,5 +1,4 @@
 const cds = require("@sap/cds");
-const LOG = cds.log("print");
 
 const PRINT = "@print";
 const PRINT_NUMBER_OF_COPIES = "@print.numberOfCopies";
@@ -14,10 +13,14 @@ cds.once("served", async () => {
   for (let srv of cds.services) {
     // Iterate over all entities in the service
     for (let entity of srv.entities) {
+      const queueEntities = [];
       if (entity.projection?.from.ref[0] === QUEUE_ENTITY_NAME) {
+        queueEntities.push(entity);
+      }
+      if (queueEntities.length > 0) {
         const printer = await cds.connect.to("print");
 
-        srv.after("READ", entity, async (_, req) => {
+        srv.after("READ", queueEntities, async (_, req) => {
           const q = await printer.getQueues();
           q.forEach((item, index) => {
             req.results[index] = { ID: item.ID };

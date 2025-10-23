@@ -6,7 +6,6 @@ const cds = require("@sap/cds/lib");
 // is stored in a document management system)
 
 module.exports = async function () {
-  const { "sap.capire.incidents.Incidents.attachments": Attachments } = cds.model.entities;
   const path = require("path");
   const fs = require("fs");
   const { Incidents } = cds.model.entities;

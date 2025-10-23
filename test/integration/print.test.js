@@ -1,7 +1,7 @@
 const cds = require("@sap/cds");
 const path = require("path");
 const app = path.join(__dirname, "../incidents-app");
-const { test, GET, POST } = cds.test(app);
+const { test, POST } = cds.test(app);
 
 describe("Tests for printing - Prod", () => {
   beforeEach(async () => {
