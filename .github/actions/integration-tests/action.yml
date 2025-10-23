@@ -56,7 +56,7 @@ runs:
       shell: bash
     - run: npm i
       shell: bash
-    - run: cd tests/incidents-app && npm i
+    - run: cd test/incidents-app && npm i
       shell: bash
     # Bind against BTP services
       # not needed with this approach, sync on which to choose
