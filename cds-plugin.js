@@ -18,7 +18,7 @@ cds.once("served", async () => {
         queueEntities.push(entity);
       }
       if (queueEntities.length > 0) {
-        // Can be disables as it is cached by CAP
+        // Can be disabled as it is cached by CAP
         // eslint-disable-next-line no-await-in-loop
         const printer = await cds.connect.to("print");
         srv.after("READ", queueEntities, async (_, req) => {
