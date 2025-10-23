@@ -23,7 +23,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm i -g @sap/cds-dk@${{ matrix.cds-version }}
       - run: npm i
-      - run: cd test/incidents-app && npm i 
+      - run: cd test/incidents-app && npm i
       - run: npm run test
   integration-tests:
     runs-on: ubuntu-latest
