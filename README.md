@@ -106,12 +106,14 @@ You can also run the application locally with a binding to the cloud print servi
 ### Local
 
 To set up local hybrid integration tests, run:
+
 ```bash
 cds bind -2 <print-service-instance-name>
 ```
 
 ### CI
-For CI, the hybrid integration tests are automatically run against a SAP Print Service instance created for testing purposes. 
+
+For CI, the hybrid integration tests are automatically run against a SAP Print Service instance created for testing purposes.
 
 ## Support, Feedback, Contributing
 

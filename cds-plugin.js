@@ -23,7 +23,7 @@ cds.once("served", async () => {
         // eslint-disable-next-line no-await-in-loop
         const printer = await cds.connect.to("print");
         srv.prepend(() => {
-          srv.on("READ", queueEntities, async (req, next) => {
+          srv.on("READ", queueEntities, async () => {
             const q = await printer.getQueues();
             return q;
           });

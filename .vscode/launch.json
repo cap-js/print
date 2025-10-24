@@ -10,7 +10,7 @@
       "runtimeArgs": ["run", "test:debug"],
       "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal"
-    }, 
+    },
     {
       "type": "pwa-node",
       "request": "launch",
@@ -20,7 +20,7 @@
       "runtimeArgs": ["run", "watch-sample"],
       "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal"
-    }, 
+    },
     {
       "type": "pwa-node",
       "request": "launch",
@@ -30,8 +30,8 @@
       "runtimeArgs": ["run", "test:integration"],
       "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal"
-    }, 
-      {
+    },
+    {
       "type": "pwa-node",
       "request": "launch",
       "name": "debug test",
@@ -40,5 +40,6 @@
       "runtimeArgs": ["run", "test"],
       "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal"
-    }]
+    }
+  ]
 }
