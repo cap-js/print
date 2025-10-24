@@ -52,18 +52,17 @@
       },
       "kinds": {
         "print-to-console": {
-          "impl": "@cap-js/print/lib/printToConsole"
+          "impl": "@cap-js/print/srv/printToConsole"
         },
         "print-to-service": {
-          "impl": "@cap-js/print/lib/printToPrintService"
+          "impl": "@cap-js/print/srv/printToPrintService"
         }
       }
     }
   },
   "scripts": {
-    "test": "npx jest --runInBand ",
-    "test:hybrid": "CDS_ENV=\"hybrid\" VCAP_SERVICES=$(cd test/incidents-app && cds bind --exec -- node -e 'process.stdout.write(process.env.VCAP_SERVICES)' | grep -E '^{.*}$' ) npx jest --runInBand",
-    "integration-test": "jest --config jest-integration.config.js",
+    "test": "npx jest",
+    "test:hybrid": "cds bind --exec -- npx jest",
     "lint": "npx eslint --fix . --no-cache",
     "in-cap-dev": "cd node_modules && rm -fr @sap/cds* @cap-js/db-service @cap-js/sqlite",
     "prettier": "npx -y prettier@3 --write .",

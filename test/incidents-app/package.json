@@ -11,21 +11,5 @@
   "sapux": [
     "app/incidents"
   ],
-  "private": true,
-  "cds": {
-    "requires": {
-      "[hybrid]": {
-        "print-service": {
-          "binding": {
-            "type": "cf",
-            "instance": "print-service",
-            "key": "print-sender"
-          },
-          "vcap": {
-            "name": "print-service"
-          }
-        }
-      }
-    }
-  }
+  "private": true
 }
