@@ -93,7 +93,7 @@ const _print = async function (printRequest) {
   const destination = await getDestination();
 
   // 1. Upload documents to be printed
-  for (const doc of docsToPrint) {
+  const uploadPromises = docsToPrint.map(async (doc) => {
     if (!doc.content) {
       LOG.error("No content provided for printing");
       throw new Error("No content provided for printing");
@@ -109,7 +109,9 @@ const _print = async function (printRequest) {
       LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
       throw new Error(`Printing failed during upload of document ${doc.fileName}.`);
     }
-  }
+  });
+
+  await Promise.all(uploadPromises);
 
   LOG.info("All documents uploaded successfully");
 
