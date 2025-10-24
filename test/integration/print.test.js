@@ -1,7 +1,7 @@
 const cds = require("@sap/cds");
 const path = require("path");
 const app = path.join(__dirname, "../incidents-app");
-const { test, POST } = cds.test(app);
+const { test, GET, POST } = cds.test(app);
 
 describe("Tests for printing - Prod", () => {
   beforeEach(async () => {
@@ -15,9 +15,18 @@ describe("Tests for printing - Prod", () => {
       `/odata/v4/processor/Incidents(ID=${incidentId},IsActiveEntity=true)/ProcessorService.printIncidentFile`,
       {
         copies: 1,
-        qnameID: "hello-marten",
+        qnameID: "OFFICE_PRINTER_01",
       },
     );
     expect(response.status).toBe(204);
+  });
+
+  it("should get the available print queues", async () => {
+    const { status, data } = await GET("odata/v4/processor/Queues");
+
+    const queueContained = data.value.some((queue) => queue.ID === "OFFICE_PRINTER_01");
+
+    expect(status).toBe(200);
+    expect(queueContained).toBe(true);
   });
 });

@@ -19,15 +19,14 @@ cds.once("served", async () => {
       }
       if (queueEntities.length > 0) {
         // Can be disabled as it is cached by CAP
+        // also needed to crash on server start when no print service is found, better than on first request
         // eslint-disable-next-line no-await-in-loop
         const printer = await cds.connect.to("print");
-        srv.after("READ", queueEntities, async (_, req) => {
-          const q = await printer.getQueues();
-          q.forEach((item, index) => {
-            req.results[index] = { ID: item.ID };
+        srv.prepend(() => {
+          srv.on("READ", queueEntities, async (req, next) => {
+            const q = await printer.getQueues();
+            return q;
           });
-          req.results.$count = q.length;
-          return;
         });
       }
 
