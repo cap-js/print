@@ -69,5 +69,8 @@
     "prettier:check": "npx -y prettier@3 --check .",
     "watch-sample": "cd test/incidents-app && cds watch",
     "watch-sample:hybrid": "cd test/incidents-app && cds watch --profile hybrid"
-  }
+  },
+  "workspaces": [
+    "test/incidents-app/"
+  ]
 }
