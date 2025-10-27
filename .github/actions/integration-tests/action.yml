@@ -59,8 +59,8 @@ runs:
     - run: cd test/incidents-app && npm i
       shell: bash
     # Bind against BTP services
-    - run: cds bind -2 print-service
+    - run: cds bind -2 print-service -o package.json
       shell: bash
     # Run tests in hybrid mode
-    - run: npm run test:hybrid
+    - run: cds bind --exec npm run test
       shell: bash
