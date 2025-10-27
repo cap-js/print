@@ -70,7 +70,6 @@ runs:
       shell: bash
     # Bind against BTP services
     - run: cds bind db -2 cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA -o package.json
-      shell: bash
     - run: cds bind -2 print-service -o package.json
       shell: bash
     # Run tests in hybrid mode
@@ -80,7 +79,7 @@ runs:
     # Cleanup
     - name: Delete HDI Container Key
       if: ${{ always() }}
-      run: cf delete-service-key cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA cap-js-attachments-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-key -f
+      run: cf delete-service-key cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-key -f
       shell: bash
     # Somehow first delete always fails with a "ongoing operation on service binding" error
     - name: Delete HDI Container
