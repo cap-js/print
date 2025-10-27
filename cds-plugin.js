@@ -18,12 +18,11 @@ cds.once("served", async () => {
         queueEntities.push(entity);
       }
       if (queueEntities.length > 0) {
-        // Can be disabled as it is cached by CAP
-        // also needed to crash on server start when no print service is found, better than on first request
         srv.prepend(() => {
-          srv.on("READ", queueEntities, async () => {
-            const q = await printer.getQueues();
-            return q;
+          srv.on("READ", queueEntities, async (req) => {
+            const queues = await printer.getQueues();
+
+            return applyOdataRequestOptions(queues, req);
           });
         });
       }
@@ -101,4 +100,54 @@ function getPrintParamsAttributeFromAction(entity, action) {
     fileNameAttribute: fileName.name,
     contentAttribute: content.name,
   };
+}
+
+// only works for entities as projections on queue entity defined in index.cds
+// Use case: provide VH to FE as SAP Print service provides a REST endpoint to get queues
+function applyOdataRequestOptions(queues, req) {
+  let result = queues;
+
+  const {
+    $search: search,
+    $filter: filter,
+    $skip: skip,
+    $top: top,
+    $count: count,
+    $orderby: orderby,
+  } = req._.req.query;
+
+  if (filter) {
+    // only allow filtering by ID eq '<value>', as only VH should be supported by now
+    const filterParts = filter.split(" ");
+    if (filterParts.length !== 3 || filterParts[0] !== "ID" || filterParts[1] !== "eq") {
+      return req.reject(400, "Invalid $filter format. Expected format: 'ID eq <value>'");
+    }
+
+    const filterValue = filterParts[2].replace(/^'(.*)'$/, "$1");
+    result = result.filter((queue) => queue.ID === filterValue);
+  } else if (search) {
+    const searchTerm = search.toLowerCase();
+    result = result.filter((queue) => queue.ID.toLowerCase().includes(searchTerm));
+    result = result.sort((a, b) => a.ID.localeCompare(b.ID));
+  }
+
+  if (orderby) {
+    const [field, direction] = orderby.split(" ");
+    if (field !== "ID") {
+      return req.reject(400, "Invalid $orderby field. Only 'ID' is supported.");
+    }
+    result = result.sort((a, b) => {
+      const comparison = a.ID.localeCompare(b.ID);
+      return direction === "desc" ? -comparison : comparison;
+    });
+  }
+
+  const skipNumber = parseInt(skip || "0", 10);
+  const topNumber = parseInt(top || result.length, 10);
+  result = result.slice(skipNumber, skipNumber + topNumber);
+
+  if (count) {
+    result.$count = result.length;
+  }
+  return result;
 }
