@@ -62,6 +62,7 @@
   },
   "scripts": {
     "test": "npx jest",
+    "test:hybrid": "cds bind --exec -- npx jest",
     "lint": "npx eslint --fix . --no-cache",
     "in-cap-dev": "cd node_modules && rm -fr @sap/cds* @cap-js/db-service @cap-js/sqlite",
     "prettier": "npx -y prettier@3 --write .",
