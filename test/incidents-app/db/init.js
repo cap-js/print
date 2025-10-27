@@ -8,7 +8,7 @@ const cds = require("@sap/cds/lib");
 module.exports = async function () {
   const path = require("path");
   const fs = require("fs");
-  const { Incidents } = cds.model.entities;
+  const { Incidents } = cds.entities;
 
   // Load the template PDF file
   const pdfPath = path.join(__dirname, "../files", "SolarPanelReport.pdf");
