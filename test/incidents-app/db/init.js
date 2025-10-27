@@ -8,7 +8,6 @@ const cds = require("@sap/cds/lib");
 module.exports = async function () {
   const path = require("path");
   const fs = require("fs");
-  const { Incidents } = cds.entities;
 
   // Load the template PDF file
   const pdfPath = path.join(__dirname, "../files", "SolarPanelReport.pdf");
@@ -48,7 +47,7 @@ module.exports = async function () {
   ];
 
   const insertPromises = newIncidents.map((incident) =>
-    INSERT.into(Incidents)
+    INSERT.into("Incidents")
       .entries({
         ...incident,
         file: templatePDF,
