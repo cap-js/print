@@ -13,9 +13,6 @@ export default [
     files: ["test/**"],
     rules: {
       "no-console": "off",
-      "no-undef": "off",
-      "no-unused-vars": "off",
-      "no-redeclare": "off",
     },
   },
 ];

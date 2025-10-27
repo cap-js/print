@@ -17,8 +17,16 @@ module.exports = class PrintToPrintService extends PrintService {
    * Get available print queues
    */
   async getQueues() {
-    const result = await _getQueues();
-    return result;
+    const destination = await getDestination();
+
+    const response = await executeHttpRequest(destination, {
+      url: "/qm/api/v1/rest/queues",
+      method: "GET",
+    });
+
+    const queues = response.data.map((q) => ({ ID: q.qname }));
+
+    return queues;
   }
 
   /**
@@ -61,24 +69,6 @@ const getDestination = async () => {
   });
 
   return destination;
-};
-
-/**
- * Populates the queue value help with available printers.
- * @param {Object} _ - Unused parameter.
- * @param {Object} req - The request object.
- */
-const _getQueues = async function () {
-  const destination = await getDestination();
-
-  const response = await executeHttpRequest(destination, {
-    url: "/qm/api/v1/rest/queues",
-    method: "GET",
-  });
-
-  const queues = response.data.map((q) => ({ ID: q.qname }));
-
-  return queues;
 };
 
 /**

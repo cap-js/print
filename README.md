@@ -105,10 +105,13 @@ You can also run the application locally with a binding to the cloud print servi
 
 ### Local
 
-To set up local hybrid integration tests, run:
+To set up local hybrid integration tests, run the following. The service key is created automatically.
 
 ```bash
-cds bind -2 <print-service-instance-name>
+# Once as setup
+cds bind -2 <print-service-instance-name> 
+# Run the tests
+cds bind --exec npm run test
 ```
 
 ### CI
