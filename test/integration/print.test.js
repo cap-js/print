@@ -2,7 +2,6 @@ const cds = require("@sap/cds");
 const path = require("path");
 const app = path.join(__dirname, "../incidents-app");
 const { test, GET, POST } = cds.test(app);
-jest.setTimeout(60 * 1000);
 
 describe("Print plugin tests", () => {
   beforeEach(async () => {
