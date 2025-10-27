@@ -109,7 +109,7 @@ To set up local hybrid integration tests, run the following. The service key is 
 
 ```bash
 # Once as setup
-cds bind -2 <print-service-instance-name> 
+cds bind -2 <print-service-instance-name>
 # Run the tests
 cds bind --exec npm run test
 ```
