@@ -1,5 +1,3 @@
-const cds = require("@sap/cds/lib");
-
 // Dummy method to populate an actual PDF file into each incident record
 // In a real app, you would e.g. generate a PDF based on incident data
 // or print a PDF that is connected to the incident (e.g. a report that
