@@ -9,7 +9,7 @@ const PRINT_FILE_CONTENT = "@print.fileContent";
 const QUEUE_ENTITY_NAME = "sap.print.Queues";
 
 cds.once("served", async () => {
-  // Iterate over all services
+  const printer = await cds.connect.to("print");
   for (let srv of cds.services) {
     // Iterate over all entities in the service
     for (let entity of srv.entities) {
@@ -20,8 +20,6 @@ cds.once("served", async () => {
       if (queueEntities.length > 0) {
         // Can be disabled as it is cached by CAP
         // also needed to crash on server start when no print service is found, better than on first request
-        // eslint-disable-next-line no-await-in-loop
-        const printer = await cds.connect.to("print");
         srv.prepend(() => {
           srv.on("READ", queueEntities, async () => {
             const q = await printer.getQueues();
@@ -37,8 +35,6 @@ cds.once("served", async () => {
           const { numberOfCopiesAttribute, queueIDAttribute, fileNameAttribute, contentAttribute } =
             getPrintParamsAttributeFromAction(entity, action);
 
-          // eslint-disable-next-line no-await-in-loop
-          const printer = await cds.connect.to("print");
           srv.on(action.name, entity, async (req) => {
             const numberOfCopies = req.data[numberOfCopiesAttribute];
             const queueID = req.data[queueIDAttribute];
