@@ -70,6 +70,7 @@ runs:
       shell: bash
     # Bind against BTP services
     - run: cds bind db -2 cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA -o package.json
+      shell: bash
     - run: cds bind -2 print-service -o package.json
       shell: bash
     # Run tests in hybrid mode
