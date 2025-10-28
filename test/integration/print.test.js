@@ -48,8 +48,8 @@ describe("Print plugin tests", () => {
     it("should get the print queues with $count", async () => {
       const { status, data } = await GET("odata/v4/processor/Queues?$count=true&$select=ID");
 
-      expect(data.value.length).toBe(10);
-      expect(data["@odata.count"]).toBe(10);
+      expect(data.value.length).toBe(8);
+      expect(data["@odata.count"]).toBe(8);
       expect(status).toBe(200);
     });
 
@@ -66,7 +66,7 @@ describe("Print plugin tests", () => {
     it("should get the print queues with $orderby descending", async () => {
       const { status, data } = await GET("odata/v4/processor/Queues?$orderby=ID desc&$select=ID");
 
-      expect(data.value.length).toBe(10);
+      expect(data.value.length).toBe(8);
       expect(data.value[0].ID).toBe("XEROX_WORKCENTRE");
       expect(status).toBe(200);
     });

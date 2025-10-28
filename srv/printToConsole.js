@@ -22,8 +22,6 @@ module.exports = class PrintToConsole extends PrintService {
       "XEROX_WORKCENTRE",
       "OFFICE_PRINTER_01",
       "OFFICE_PRINTER_02",
-      "hello-marten-mock",
-      "demo-queue-mock",
     ];
 
     const queues = [];
