@@ -30,8 +30,16 @@
   },
   "devDependencies": {
     "@cap-js/cds-test": "^0.2.0",
-    "@cap-js/sqlite": ">1"
+    "@cap-js/sqlite": "*"
   },
+  "overrides": {
+    "@cap-js/sqlite": "$@cap-js/sqlite",
+    "@cap-js/hana": "$@cap-js/hana",
+    "@cap-js/db-service": "$@cap-js/db-service"
+  },
+  "workspaces": [
+    "test/incidents-app/"
+  ],
   "cds": {
     "requires": {
       "destinations": true,
@@ -69,8 +77,5 @@
     "prettier:check": "npx -y prettier@3 --check .",
     "watch-sample": "cd test/incidents-app && cds watch",
     "watch-sample:hybrid": "cd test/incidents-app && cds watch --profile hybrid"
-  },
-  "workspaces": [
-    "test/incidents-app/"
-  ]
+  }
 }
