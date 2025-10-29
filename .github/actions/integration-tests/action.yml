@@ -54,6 +54,8 @@ runs:
         node-version: ${{ matrix.node-version }}
     - run: npm i -g @sap/cds-dk@${{ matrix.cds-version }}
       shell: bash
+    - run: npm i @sap/cds@${{ matrix.cds-version }}
+      shell: bash
     - run: npm i
       shell: bash
     - run: cd test/incidents-app && npm i
