@@ -26,15 +26,11 @@
     "@sap/xssec": "^3.6.2"
   },
   "peerDependencies": {
-    "@sap/cds": "^8"
+    "@sap/cds": ">=9"
   },
   "devDependencies": {
     "@cap-js/cds-test": "^0.2.0",
-    "@cap-js/sqlite": "^1",
-    "@sap/cds": "^8",
-    "eslint": "^9.4.0",
-    "eslint-plugin-jest": "^28.5.0",
-    "jest": "^29.7.0"
+    "@cap-js/sqlite": "^2"
   },
   "cds": {
     "requires": {
@@ -56,22 +52,25 @@
       },
       "kinds": {
         "print-to-console": {
-          "impl": "@cap-js/print/lib/printToConsole"
+          "impl": "@cap-js/print/srv/printToConsole"
         },
         "print-to-service": {
-          "impl": "@cap-js/print/lib/printToPrintService"
+          "impl": "@cap-js/print/srv/printToPrintService"
         }
       }
     }
   },
   "scripts": {
-    "test": "jest --coverage --config jest.config.js",
-    "integration-test": "jest --config jest-integration.config.js",
+    "test": "npx jest",
+    "test:hybrid": "cds bind --exec -- npx jest",
     "lint": "npx eslint --fix . --no-cache",
     "in-cap-dev": "cd node_modules && rm -fr @sap/cds* @cap-js/db-service @cap-js/sqlite",
     "prettier": "npx -y prettier@3 --write .",
     "prettier:check": "npx -y prettier@3 --check .",
     "watch-sample": "cd test/incidents-app && cds watch",
     "watch-sample:hybrid": "cd test/incidents-app && cds watch --profile hybrid"
-  }
+  },
+  "workspaces": [
+    "test/incidents-app/"
+  ]
 }

@@ -103,7 +103,20 @@ When running the application locally, i.e. `cds watch`, the print service is moc
 
 You can also run the application locally with a binding to the cloud print service with CAP profiles. For more information, see [Hybrid Testing](https://cap.cloud.sap/docs/advanced/hybrid-testing#hybrid-testing). You need an instance of the SAP Print Service.
 
-TODO: More doc about setting up the print service
+### Local
+
+To set up local hybrid integration tests, run the following. The service key is created automatically.
+
+```bash
+# Once as setup
+cds bind -2 <print-service-instance-name>
+# Run the tests
+cds bind --exec npm run test
+```
+
+### CI
+
+For CI, the hybrid integration tests are automatically run against a SAP Print Service instance created for testing purposes.
 
 ## Support, Feedback, Contributing
 

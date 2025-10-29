@@ -13,14 +13,23 @@ module.exports = class PrintToConsole extends PrintService {
    * Get available print queues (dummy data for console mode)
    */
   async getQueues() {
-    return [
-      { ID: "DEFAULT_PRINTER" },
-      { ID: "HP_LASERJET_PRO" },
-      { ID: "CANON_IMAGECLASS" },
-      { ID: "XEROX_WORKCENTRE" },
-      { ID: "OFFICE_PRINTER_01" },
-      { ID: "OFFICE_PRINTER_02" },
+    const printers = [
+      "DEFAULT_PRINTER_1",
+      "DEFAULT_PRINTER_2",
+      "DEFAULT_PRINTER_3",
+      "HP_LASERJET_PRO",
+      "CANON_IMAGECLASS",
+      "XEROX_WORKCENTRE",
+      "OFFICE_PRINTER_01",
+      "OFFICE_PRINTER_02",
     ];
+
+    const queues = [];
+    printers.forEach((printer) => {
+      queues.push({ ID: `${printer}` });
+    });
+
+    return queues;
   }
 
   /**
@@ -33,7 +42,6 @@ module.exports = class PrintToConsole extends PrintService {
     LOG.info("Received print request:", JSON.stringify(printRequest));
 
     // Get available queues and validate the selected queue
-    const availableQueues = await this.getQueues();
 
     LOG.info("===============================");
     LOG.info(`PRINT JOB DETAILS`);

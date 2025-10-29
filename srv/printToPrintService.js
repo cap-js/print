@@ -17,8 +17,16 @@ module.exports = class PrintToPrintService extends PrintService {
    * Get available print queues
    */
   async getQueues() {
-    const result = await _getQueues();
-    return result;
+    const destination = await getDestination();
+
+    const response = await executeHttpRequest(destination, {
+      url: "/qm/api/v1/rest/queues",
+      method: "GET",
+    });
+
+    const queues = response.data.map((q) => ({ ID: q.qname }));
+
+    return queues;
   }
 
   /**
@@ -64,24 +72,6 @@ const getDestination = async () => {
 };
 
 /**
- * Populates the queue value help with available printers.
- * @param {Object} _ - Unused parameter.
- * @param {Object} req - The request object.
- */
-const _getQueues = async function () {
-  const destination = await getDestination();
-
-  const response = await executeHttpRequest(destination, {
-    url: "/qm/api/v1/rest/queues",
-    method: "GET",
-  });
-
-  const queues = response.data.map((q) => ({ ID: q.qname }));
-
-  return queues;
-};
-
-/**
  * Handles the print request.
  * @param {Object} _ - Unused parameter.
  * @param {Object} req - The request object.
@@ -93,7 +83,7 @@ const _print = async function (printRequest) {
   const destination = await getDestination();
 
   // 1. Upload documents to be printed
-  for (const doc of docsToPrint) {
+  const uploadPromises = docsToPrint.map(async (doc) => {
     if (!doc.content) {
       LOG.error("No content provided for printing");
       throw new Error("No content provided for printing");
@@ -109,7 +99,9 @@ const _print = async function (printRequest) {
       LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
       throw new Error(`Printing failed during upload of document ${doc.fileName}.`);
     }
-  }
+  });
+
+  await Promise.all(uploadPromises);
 
   LOG.info("All documents uploaded successfully");
 

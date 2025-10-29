@@ -1,15 +1,11 @@
-const cds = require("@sap/cds/lib");
-
 // Dummy method to populate an actual PDF file into each incident record
 // In a real app, you would e.g. generate a PDF based on incident data
 // or print a PDF that is connected to the incident (e.g. a report that
 // is stored in a document management system)
 
 module.exports = async function () {
-  const { "sap.capire.incidents.Incidents.attachments": Attachments } = cds.model.entities;
   const path = require("path");
   const fs = require("fs");
-  const { Incidents } = cds.model.entities;
 
   // Load the template PDF file
   const pdfPath = path.join(__dirname, "../files", "SolarPanelReport.pdf");
@@ -48,12 +44,17 @@ module.exports = async function () {
     },
   ];
 
-  for (const incident of newIncidents) {
-    await INSERT.into(Incidents).entries({
-      ...incident,
-      file: templatePDF,
-      fileName: `Incident_${incident.ID}_Report.pdf`,
-    });
-    console.log(`Inserted incident ${incident.ID}: ${incident.title}`);
-  }
+  const insertPromises = newIncidents.map((incident) =>
+    INSERT.into("Incidents")
+      .entries({
+        ...incident,
+        file: templatePDF,
+        fileName: `Incident_${incident.ID}_Report.pdf`,
+      })
+      .then(() => {
+        console.log(`Inserted incident ${incident.ID}: ${incident.title}`);
+      }),
+  );
+
+  await Promise.all(insertPromises);
 };
