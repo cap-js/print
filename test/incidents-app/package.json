@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@cap-js/hana": ">1",
+    "@cap-js/db-service": ">1",
     "@cap-js/print": "file:../../."
   },
   "scripts": {
