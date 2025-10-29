@@ -57,7 +57,7 @@ runs:
     - name: Set CDS version-specific dependencies
       shell: bash
       run: |
-        if [ "${{ matrix.cds-version }}" == "8.9.4" ]; then
+        if [ "${{ matrix.cds-version }}" == "8" ]; then
           echo "Installing CDS 8 compatible packages..."
           npm pkg set "devDependencies.@cap-js/sqlite=^1.0.0"
           npm pkg set "overrides.@cap-js/sqlite=^1.0.0"
