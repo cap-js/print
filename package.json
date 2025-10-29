@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@cap-js/cds-test": "^0.2.0",
-    "@cap-js/sqlite": ">1"
+    "@cap-js/sqlite": "^1"
   },
   "cds": {
     "requires": {
