@@ -30,12 +30,7 @@
   },
   "devDependencies": {
     "@cap-js/cds-test": "^0.2.0",
-    "@cap-js/sqlite": "*"
-  },
-  "overrides": {
-    "@cap-js/sqlite": "$@cap-js/sqlite",
-    "@cap-js/hana": "$@cap-js/hana",
-    "@cap-js/db-service": "$@cap-js/db-service"
+    "@cap-js/sqlite": "^2"
   },
   "workspaces": [
     "test/incidents-app/"
