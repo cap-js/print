@@ -48,42 +48,46 @@ runs:
         done
 
     - uses: actions/checkout@v2
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install @cap-js/sqlite for CDS 8
-      if: ${{ matrix.cds-version == '8.9.4' }}
+    - name: Set CDS version-specific dependencies
       shell: bash
-      run: npm i -D @cap-js/sqlite@1
+      run: |
+        if [ "${{ matrix.cds-version }}" == "8.9.4" ]; then
+          echo "Installing CDS 8 compatible packages..."
+          npm pkg set "devDependencies.@cap-js/sqlite=^1.0.0"
+          npm pkg set "overrides.@cap-js/sqlite=^1.0.0"
+          npm pkg set "overrides.@cap-js/hana=^1.0.0"
+          npm pkg set "overrides.@cap-js/db-service=^1.0.0"
+          cd test/incidents-app
+          npm pkg set "dependencies.@cap-js/hana=^1.0.0"
+          npm pkg set "dependencies.@cap-js/db-service=^1.0.0"
+          cd ../..
+        else
+          echo "Installing CDS 9 compatible packages..."
+          npm pkg set "devDependencies.@cap-js/sqlite=^2.0.0"
+          npm pkg set "overrides.@cap-js/sqlite=^2.0.0"
+          npm pkg set "overrides.@cap-js/hana=^2.0.0"
+          npm pkg set "overrides.@cap-js/db-service=^2.0.0"
+          cd test/incidents-app
+          npm pkg set "dependencies.@cap-js/hana=^2.0.0"
+          npm pkg set "dependencies.@cap-js/db-service=^2.0.0"
+          cd ../..
+        fi
 
-    - name: Install @cap-js/sqlite for CDS 8
-      if: ${{ matrix.cds-version == '8.9.4' }}
+    - name: Install global CDS
       shell: bash
-      run: cd test/incidents-app && npm install @sap/cds@8.9.4 @cap-js/hana@1.9.2 @cap-js/db-service@1.20.3
-    - name: Install @cap-js/sqlite for CDS 8
-      if: ${{ matrix.cds-version == '8.9.4' }}
-      shell: bash
-      run: cd test/incidents-app && npm i
-    - name: Install @cap-js/sqlite for CDS 8
-      if: ${{ matrix.cds-version == '8.9.4' }}
-      shell: bash
-      run: npm install @sap/cds@8.9.4
+      run: npm i -g @sap/cds-dk@${{ matrix.cds-version }}
 
-    - run: npm i -g @sap/cds-dk@${{ matrix.cds-version }}
+    - name: Install root dependencies
       shell: bash
-
-    - run: cd test/incidents-app && npm i @sap/cds@${{ matrix.cds-version }}
-      shell: bash
-
-    - run: npm i @sap/cds@${{ matrix.cds-version }}
-      shell: bash
-
-    - run: npm i
-      shell: bash
-    - run: cd test/incidents-app && npm i
-      shell: bash
+      run: |
+        npm install @sap/cds@${{ matrix.cds-version }}
+        npm install
 
     - name: Set node env for HANA
       run: echo "NODE_VERSION_HANA=$(echo ${{ inputs.NODE_VERSION }} | tr . _)" >> $GITHUB_ENV
