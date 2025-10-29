@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "dependencies": {
     "@cap-js/hana": "*",
-    "@cap-js/print": "file:../../."
+    "@cap-js/print": "file:../../.",
+    "@sap/cds": ">= 8"
   },
   "scripts": {
     "watch": "cds watch",
