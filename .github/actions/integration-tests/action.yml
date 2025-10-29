@@ -67,16 +67,6 @@ runs:
           npm pkg set "dependencies.@cap-js/hana=^1.0.0"
           npm pkg set "dependencies.@cap-js/db-service=^1.0.0"
           cd ../..
-        else
-          echo "Installing CDS 9 compatible packages..."
-          npm pkg set "devDependencies.@cap-js/sqlite=^2.0.0"
-          npm pkg set "overrides.@cap-js/sqlite=^2.0.0"
-          npm pkg set "overrides.@cap-js/hana=^2.0.0"
-          npm pkg set "overrides.@cap-js/db-service=^2.0.0"
-          cd test/incidents-app
-          npm pkg set "dependencies.@cap-js/hana=^2.0.0"
-          npm pkg set "dependencies.@cap-js/db-service=^2.0.0"
-          cd ../..
         fi
 
     - name: Install global CDS
