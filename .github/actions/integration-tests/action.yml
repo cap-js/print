@@ -56,12 +56,12 @@ runs:
     - name: Install @cap-js/sqlite for CDS 8
       if: ${{ matrix.cds-version == '8.9.4' }}
       shell: bash
-      run: npm i -D @cap-js/sqlite@1
+      run: npm i -D @cap-js/sqlite@1 && cd test/incidents-app && npm i @cap-js/hana@1
 
-    - name: Install @cap-js/sqlite for CDS 9 (or latest)
-      if: ${{ matrix.cds-version == 'latest' }}
-      shell: bash
-      run: npm i -D @cap-js/sqlite@2
+    # - name: Install @cap-js/sqlite for CDS 9 (or latest)
+    #   if: ${{ matrix.cds-version == 'latest' }}
+    #   shell: bash
+    #   run: npm i -D @cap-js/sqlite@2 && cd test/incidents-app && npm i @cap-js/hana@2
     - run: npm i -g @sap/cds-dk@${{ matrix.cds-version }}
       shell: bash
 
