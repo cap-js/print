@@ -73,7 +73,6 @@ runs:
     - name: Install global CDS
       shell: bash
       run: npm i -g @sap/cds-dk@${{ matrix.cds-version }}
-      shell: bash
     - name: Install root dependencies
       shell: bash
       run: |
