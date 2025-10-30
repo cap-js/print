@@ -1,5 +1,5 @@
 const config = {
-  testTimeout: 60000,
+  testTimeout: 120000,
   testMatch: ["**/*.test.js"],
   forceExit: true,
   detectOpenHandles: true,

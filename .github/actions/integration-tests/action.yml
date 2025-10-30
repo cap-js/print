@@ -48,16 +48,36 @@ runs:
         done
 
     - uses: actions/checkout@v2
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm i -g @sap/cds-dk
+
+    - name: Set CDS version-specific dependencies
       shell: bash
-    - run: npm i
+      run: |
+        if [ "${{ matrix.cds-version }}" == "8" ]; then
+          echo "Installing CDS 8 compatible packages..."
+          npm pkg set "devDependencies.@cap-js/sqlite=^1.0.0"
+          npm pkg set "overrides.@cap-js/sqlite=^1.0.0"
+          npm pkg set "overrides.@cap-js/hana=^1.0.0"
+          npm pkg set "overrides.@cap-js/db-service=^1.0.0"
+          cd test/incidents-app
+          npm pkg set "dependencies.@cap-js/hana=^1.0.0"
+          npm pkg set "dependencies.@cap-js/db-service=^1.0.0"
+          cd ../..
+        fi
+
+    - name: Install global CDS
       shell: bash
-    - run: cd test/incidents-app && npm i
+      run: npm i -g @sap/cds-dk@${{ matrix.cds-version }}
+
+    - name: Install root dependencies
       shell: bash
+      run: |
+        npm install @sap/cds@${{ matrix.cds-version }}
+        npm install
 
     - name: Set node env for HANA
       run: echo "NODE_VERSION_HANA=$(echo ${{ inputs.NODE_VERSION }} | tr . _)" >> $GITHUB_ENV
@@ -65,13 +85,13 @@ runs:
     # Deploy model to HANA
     - name: Create HDI Container
       shell: bash
-      run: cf create-service hana hdi-shared cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA
-    - run: cd test/incidents-app/ && cds deploy --to hana:cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA
+      run: cf create-service hana hdi-shared cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}
+    - run: cd test/incidents-app/ && cds deploy --to hana:cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}
       shell: bash
     # Bind against BTP services
-    - run: cds bind db -2 cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA -o package.json
+    - run: cds bind db -2 cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} -o package.json
       shell: bash
-    - run: cds bind -2 print-service -o package.json
+    - run: cds bind print-service -2 print-service -o package.json
       shell: bash
     # Run tests in hybrid mode
     - run: cds bind --exec npm run test
@@ -80,7 +100,7 @@ runs:
     # Cleanup
     - name: Delete HDI Container Key
       if: ${{ always() }}
-      run: cf delete-service-key cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-key -f
+      run: cf delete-service-key cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}-key -f
       shell: bash
     # Somehow first delete always fails with a "ongoing operation on service binding" error
     - name: Delete HDI Container
@@ -88,7 +108,7 @@ runs:
       shell: bash
       run: |
         for i in {1..3}; do
-          cf delete-service cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA -f && break
+          cf delete-service cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} -f && break
           echo "HDI container delete failed, retrying ($i/3)..."
           sleep 10
           if [ "$i" -eq 3 ]; then
