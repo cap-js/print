@@ -33,6 +33,8 @@ runs:
         sudo mv cf8 /usr/local/bin/
         cf --version
 
+    # BTP Auth
+    # Uncomment when you want to run hybrid integration tests
     - name: Authenticate with Cloud Foundry
       shell: bash
       run: |
@@ -48,7 +50,6 @@ runs:
         done
 
     - uses: actions/checkout@v2
-
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
@@ -69,38 +70,44 @@ runs:
           cd ../..
         fi
 
-    - name: Install global CDS
-      shell: bash
       run: npm i -g @sap/cds-dk@${{ matrix.cds-version }}
-
+      shell: bash
     - name: Install root dependencies
       shell: bash
       run: |
         npm install @sap/cds@${{ matrix.cds-version }}
         npm install
 
+    # HANA Cloud Deployment and binding
+    # Uncomment when you want to run your hybrid integration tests against HANA Cloud
+    # Replace print with your actual project name
     - name: Set node env for HANA
       run: echo "NODE_VERSION_HANA=$(echo ${{ inputs.NODE_VERSION }} | tr . _)" >> $GITHUB_ENV
       shell: bash
-    # Deploy model to HANA
+    Deploy model to HANA
     - name: Create HDI Container
       shell: bash
-      run: cf create-service hana hdi-shared cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}
-    - run: cd test/incidents-app/ && cds deploy --to hana:cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}
+      run: cf create-service hana hdi-shared cap-js-print-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}
+    - run: cd tests/incidents-app/ && cds deploy --to hana:cap-js-print-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}
       shell: bash
+    # Bind HANA Cloud instance
+    - run: cds bind db -2 cap-js-print-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} -o package.json
+      shell: bash
+
     # Bind against BTP services
-    - run: cds bind db -2 cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} -o package.json
-      shell: bash
+    # Uncomment when actual BTP services should be used
     - run: cds bind print-service -2 print-service -o package.json
       shell: bash
     # Run tests in hybrid mode
-    - run: cds bind --exec npm run test
+    - run: npm run test:hybrid
       shell: bash
 
-    # Cleanup
+    # HANA Cleanup
+    # Uncomment when you want to run your hybrid integration tests against HANA Cloud
+    # Replace print with your actual project name
     - name: Delete HDI Container Key
       if: ${{ always() }}
-      run: cf delete-service-key cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}-key -f
+      run: cf delete-service-key cap-js-print-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} cap-js-print-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}-key -f
       shell: bash
     # Somehow first delete always fails with a "ongoing operation on service binding" error
     - name: Delete HDI Container
@@ -108,7 +115,7 @@ runs:
       shell: bash
       run: |
         for i in {1..3}; do
-          cf delete-service cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} -f && break
+          cf delete-service cap-js-print-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} -f && break
           echo "HDI container delete failed, retrying ($i/3)..."
           sleep 10
           if [ "$i" -eq 3 ]; then
