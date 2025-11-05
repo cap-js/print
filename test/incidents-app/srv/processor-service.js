@@ -5,7 +5,7 @@ class ProcessorService extends cds.ApplicationService {
     const { Incidents } = this.entities;
 
     // Connect to print service once during initialization
-    const printer = await cds.connect.to("print");
+    const printer = await cds.connect.to("PrintService");
 
     // Print action handler - print the stored PDF for this incident
     this.on("printIncidentFileManualImpl", Incidents, async (req) => {

@@ -2,20 +2,12 @@ using ProcessorService as service from '../srv/processor-service';
 using from './incidents/annotations';
 
 // UI annotations for the print functionality
-annotate service.Incidents with @(UI.Identification: [
-  {
-    $Type  : 'UI.DataFieldForAction',
-    Action : 'ProcessorService.printIncidentFile',
-    Label  : '{i18n>Print}',
-    IconUrl: 'sap-icon://print'
-  },
-  {
-    $Type  : 'UI.DataFieldForAction',
-    Action : 'ProcessorService.printIncidentFileManualImpl',
-    Label  : '{i18n>PrintManualImpl}',
-    IconUrl: 'sap-icon://print'
-  }
-]);
+annotate service.Incidents with @(UI.Identification: [{
+  $Type  : 'UI.DataFieldForAction',
+  Action : 'ProcessorService.printIncidentFileManualImpl',
+  Label  : '{i18n>PrintManualImpl}',
+  IconUrl: 'sap-icon://print'
+}]);
 
 // Create a field group for the file
 annotate service.Incidents with @(UI.FieldGroup #PrintFileGroup: {

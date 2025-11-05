@@ -1,36 +1,11 @@
 using {sap.capire.incidents as my} from '../db/schema';
-using {sap.print as sp} from '@cap-js/print';
+using {PrintService.Queues as q} from '@cap-js/print/srv/BTPPrintService';
+
 
 service ProcessorService {
-    entity Incidents as
-        projection on my.Incidents {
-            *,
-            @print.fileContent
-            file,
-            @print.fileName
-            fileName
-        }
+    @PDF.Printable
+    entity Incidents as projection on my.Incidents
         actions {
-            @print
-            action printIncidentFile(
-                                     @Common: {
-                                         ValueListWithFixedValues,
-                                         ValueList: {
-                                             $Type         : 'Common.ValueListType',
-                                             CollectionPath: 'Queues',
-                                             Parameters    : [{
-                                                 $Type            : 'Common.ValueListParameterInOut',
-                                                 LocalDataProperty: qnameID,
-                                                 ValueListProperty: 'ID'
-                                             }]
-                                         },
-                                         Label    : 'Print Queues',
-                                     }
-                                     @print.queue
-                                     qnameID: String,
-                                     @print.numberOfCopies
-                                     @UI.ParameterDefaultValue: 1
-                                     copies: Integer);
             action printIncidentFileManualImpl(
                                                @Common: {
                                                    ValueListWithFixedValues,
@@ -54,5 +29,5 @@ service ProcessorService {
 
     annotate my.Customers with @cds.autoexpose;
 
-    entity Queues    as projection on sp.Queues;
+    entity Queues    as projection on q;
 }
