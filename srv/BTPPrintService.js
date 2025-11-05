@@ -40,7 +40,7 @@ module.exports = class BTPPrintService extends PrintService {
       `Print request received for queue: ${qname}, copies: ${numberOfCopies}, documents: ${docsToPrint?.length || 0}`,
     );
 
-    const result = await _print(printRequest);
+    await _print(printRequest);
 
     LOG.info(`Print request successfully processed.`);
 

@@ -2,7 +2,6 @@ const cds = require("@sap/cds");
 
 const enhanceModel = require("./lib/enhance-csn");
 
-const PRINT = "@PDF.Printable";
 const PRINT_ACTION = "@PDF.Printable.Action";
 const QUEUE_ENTITY = "@PDF.Printable.QueueEntity";
 const COPIES_ELEMENT = "copies";

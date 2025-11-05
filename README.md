@@ -21,6 +21,7 @@ Usage of this plugin requires a valid subscription of the [SAP Print Service](ht
 ## Usage
 
 To use this plugin to print documents there are two main steps:
+
 1. Make sure your CDS model is modelled correctly
 2. Annotate your CDS model with `@PDF.Printable`
 
@@ -31,33 +32,36 @@ To use this plugin to print documents there are two main steps:
 - TODO: Your entity only has one `LargeBinary` attribute to print
 
 ### Annotations in CDS model
+
 To use the print plugin, simply annotate your entity with `@PDF.Printable`:
 
 ```cds
 @PDF.Printable
-entity Incidents as projection on my.Incidents; 
+entity Incidents as projection on my.Incidents;
 ```
 
 This annotation does the following things in the background:
+
 - Adds an action `print` to the annotated entity.
 - This action is added to the UI and a handler is generated to process the print request.
 - An entity `PrintServiceQueues` is added to the service to provide available print queues in a value help.
 
 ## Manual usage
+
 You can also use the print service to print documents manually, i.e. without the `@PDF.Printable` annotations and generated actions and handlers. For this, you can use the `cds.connect.to`-API of CAP to connect to the print service and invoke the `print` action manually.
 
 ```javascript
-const printService = cds.connect.to("PrintService")
+const printService = cds.connect.to("PrintService");
 await printService.send("print", {
-    qname: "Printer_Queue_Name",
-    numberOfCopies: 1,
-    docsToPrint: [
-        {
-            fileName: "file_name.pdf",
-            content: "<base64-encoded-pdf-content>",
-            isMainDocument: true,
-        },
-    ],
+  qname: "Printer_Queue_Name",
+  numberOfCopies: 1,
+  docsToPrint: [
+    {
+      fileName: "file_name.pdf",
+      content: "<base64-encoded-pdf-content>",
+      isMainDocument: true,
+    },
+  ],
 });
 ```
 
