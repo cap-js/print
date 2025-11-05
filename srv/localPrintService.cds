@@ -1,3 +1,3 @@
 using PrintService as service from './BTPPrintService';
 
-annotate service with @impl: './localPrintService.js'
+annotate service with @impl: './localPrintService.js';
