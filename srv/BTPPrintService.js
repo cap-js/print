@@ -7,7 +7,7 @@ const {
 } = require("@sap-cloud-sdk/connectivity");
 const { executeHttpRequest } = require("@sap-cloud-sdk/http-client");
 
-module.exports = class PrintToPrintService extends PrintService {
+module.exports = class BTPPrintService extends PrintService {
   async init() {
     LOG.info("Productive Print service initialized.");
     return super.init();

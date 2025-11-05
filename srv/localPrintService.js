@@ -2,7 +2,7 @@ const PrintService = require("./service");
 const cds = require("@sap/cds");
 const LOG = cds.log("print");
 
-module.exports = class PrintToConsole extends PrintService {
+module.exports = class LocalPrintService extends PrintService {
   async init() {
     LOG.info("Print service initialized for console mode");
 
