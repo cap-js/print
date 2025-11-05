@@ -1,6 +1,6 @@
 {
   "name": "@cap-js/print",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "CAP plugin for SAP Cloud Print Service.",
   "repository": "@cap-js/print",
   "homepage": "https://cap.cloud.sap/",
@@ -26,12 +26,15 @@
     "@sap/xssec": "^3.6.2"
   },
   "peerDependencies": {
-    "@sap/cds": ">=9"
+    "@sap/cds": ">= 8"
   },
   "devDependencies": {
     "@cap-js/cds-test": "^0.2.0",
     "@cap-js/sqlite": "^2"
   },
+  "workspaces": [
+    "test/incidents-app/"
+  ],
   "cds": {
     "requires": {
       "destinations": true,
@@ -69,8 +72,5 @@
     "prettier:check": "npx -y prettier@3 --check .",
     "watch-sample": "cd test/incidents-app && cds watch",
     "watch-sample:hybrid": "cd test/incidents-app && cds watch --profile hybrid"
-  },
-  "workspaces": [
-    "test/incidents-app/"
-  ]
+  }
 }

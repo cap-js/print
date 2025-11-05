@@ -2,7 +2,8 @@
   "name": "@capire/incidents",
   "version": "1.0.0",
   "dependencies": {
-    "@cap-js/hana": "*",
+    "@cap-js/hana": "^2.0.0",
+    "@cap-js/db-service": "^2.0.0",
     "@cap-js/print": "file:../../."
   },
   "scripts": {
