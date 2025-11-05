@@ -69,10 +69,7 @@ module.exports = class LocalPrintService extends PrintService {
     LOG.info(`Sent to: ${selectedQueue}`);
 
     return {
-      status: "success",
-      message: `Print job sent to ${selectedQueue.ID} for ${numberOfCopies || 1} copies`,
       taskId: `console-task-${Date.now()}`,
-      queueUsed: selectedQueue,
     };
   }
 };

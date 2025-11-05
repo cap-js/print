@@ -64,7 +64,7 @@ cds.once("served", async () => {
               return Buffer.concat(chunks).toString("base64");
             };
             try {
-              await printer.print({
+              await printer.send("print", {
                 qname: queueID,
                 numberOfCopies: numberOfCopies,
                 docsToPrint: [

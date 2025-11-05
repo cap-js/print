@@ -9,6 +9,10 @@ class PrintService extends cds.Service {
       return this.applyOdataRequestOptions(queues, req);
     });
 
+    this.on("print", async (req) => {
+      return await this.print(req.data);
+    });
+
     super.init();
   }
   // only works for entities as projections on queue entity defined in index.cds

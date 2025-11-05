@@ -38,7 +38,7 @@ class ProcessorService extends cds.ApplicationService {
 
       try {
         // Send the incident's PDF to the print service
-        await printer.print({
+        await printer.send("print", {
           qname: req.data.qnameID,
           numberOfCopies: req.data.copies,
           docsToPrint: [

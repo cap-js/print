@@ -48,7 +48,6 @@ module.exports = class BTPPrintService extends PrintService {
       status: "success",
       message: `Print job sent to ${qname} for ${numberOfCopies} copies`,
       taskId: `console-task-${Date.now()}`,
-      details: result,
     };
   }
 };
@@ -146,9 +145,6 @@ const _print = async function (printRequest) {
   LOG.info(`Document sent to print queue ${selectedQueue}`);
 
   return {
-    status: "SUCCESS",
-    queue: selectedQueue,
-    numberOfCopies,
     taskId: itemId,
   };
 };
