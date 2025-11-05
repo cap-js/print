@@ -11,7 +11,7 @@ service ProcessorService {
                                                    ValueListWithFixedValues,
                                                    ValueList: {
                                                        $Type         : 'Common.ValueListType',
-                                                       CollectionPath: 'Queues',
+                                                       CollectionPath: 'PrintServiceQueues',
                                                        Parameters    : [{
                                                            $Type            : 'Common.ValueListParameterInOut',
                                                            LocalDataProperty: qnameID,

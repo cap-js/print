@@ -9,11 +9,24 @@ describe("Print plugin tests", () => {
   });
 
   describe("Printing process", () => {
-    it("should send a print request via bound action", async () => {
+    it("should send a print request via bound action automatically added", async () => {
       const incidentId = "3583f982-d7df-4aad-ab26-301d4a157cd7";
 
       const response = await POST(
         `/odata/v4/processor/Incidents(ID=${incidentId},IsActiveEntity=true)/ProcessorService.print`,
+        {
+          copies: 1,
+          qnameID: "OFFICE_PRINTER_01",
+        },
+      );
+      expect(response.status).toBe(204);
+    });
+
+    it("should send a print request via bound action automatically added", async () => {
+      const incidentId = "3583f982-d7df-4aad-ab26-301d4a157cd7";
+
+      const response = await POST(
+        `/odata/v4/processor/Incidents(ID=${incidentId},IsActiveEntity=true)/ProcessorService.printIncidentFileManualImpl`,
         {
           copies: 1,
           qnameID: "OFFICE_PRINTER_01",
@@ -73,6 +86,30 @@ describe("Print plugin tests", () => {
       expect(data.value.length).toBe(8);
       expect(data.value[0].ID).toBe("XEROX_WORKCENTRE");
       expect(status).toBe(200);
+    });
+  });
+  describe("UI", () => {
+    let metadata;
+
+    beforeAll(async () => {
+      const response = await GET("/odata/v4/processor/$metadata?$format=json");
+      metadata = response.data;
+    });
+
+    it("should add the print action to the UI identification", async () => {
+      metadata.ProcessorService["$Annotations"]["ProcessorService.Incidents"]["@UI.Identification"];
+      const identificationArray =
+        metadata.ProcessorService["$Annotations"]["ProcessorService.Incidents"][
+          "@UI.Identification"
+        ];
+      const hasPrintAction = identificationArray.some(
+        (item) =>
+          item["@type"] ===
+            "https://sap.github.io/odata-vocabularies/vocabularies/UI.xml#UI.DataFieldForAction" &&
+          item.Action === "ProcessorService.print" &&
+          item.Label === "Print",
+      );
+      expect(hasPrintAction).toBe(true);
     });
   });
 });
