@@ -1,6 +1,4 @@
 using {sap.capire.incidents as my} from '../db/schema';
-using {PrintService.Queues as q} from '@cap-js/print/srv/BTPPrintService';
-
 
 service ProcessorService {
     @PDF.Printable
@@ -29,5 +27,4 @@ service ProcessorService {
 
     annotate my.Customers with @cds.autoexpose;
 
-    entity Queues    as projection on q;
 }
