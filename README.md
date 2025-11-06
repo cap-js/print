@@ -37,7 +37,7 @@ To use the print plugin, simply annotate your entity with `@PDF.Printable`:
 
 ```cds
 @PDF.Printable
-entity Incidents as projection on my.Incidents;
+entity Books as projection on my.Books;
 ```
 
 This annotation does the following things in the background:

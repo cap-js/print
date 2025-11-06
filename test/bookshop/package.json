@@ -1,0 +1,17 @@
+{
+  "name": "@capire/bookshop",
+  "version": "1.0.0",
+  "dependencies": {
+    "@cap-js/hana": "^2.0.0",
+    "@cap-js/db-service": "^2.0.0",
+    "@cap-js/print": "file:../../."
+  },
+  "scripts": {
+    "watch": "cds watch",
+    "watch:hybrid": "cds watch --profile hybrid"
+  },
+  "sapux": [
+    "app/incidents"
+  ],
+  "private": true
+}
