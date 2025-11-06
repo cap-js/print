@@ -12,13 +12,10 @@ describe("Print plugin tests", () => {
     it("should send a print request via bound action automatically added", async () => {
       const bookId = 201;
 
-      const response = await POST(
-        `/odata/v4/catalog/Books(ID=${bookId})/CatalogService.print`,
-        {
-          copies: 1,
-          qnameID: "OFFICE_PRINTER_01",
-        },
-      );
+      const response = await POST(`/odata/v4/catalog/Books(ID=${bookId})/CatalogService.print`, {
+        copies: 1,
+        qnameID: "OFFICE_PRINTER_01",
+      });
       expect(response.status).toBe(204);
     });
 
@@ -99,9 +96,7 @@ describe("Print plugin tests", () => {
     it("should add the print action to the UI identification", async () => {
       metadata.CatalogService["$Annotations"]["CatalogService.Books"]["@UI.Identification"];
       const identificationArray =
-        metadata.CatalogService["$Annotations"]["CatalogService.Books"][
-          "@UI.Identification"
-        ];
+        metadata.CatalogService["$Annotations"]["CatalogService.Books"]["@UI.Identification"];
       const hasPrintAction = identificationArray.some(
         (item) =>
           item["@type"] ===

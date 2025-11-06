@@ -68,7 +68,7 @@ await printService.send("print", {
 const queues = await printService.get("/Queues");
 ```
 
-It is possible that for LargeBinaries, that you get from the database, the content is provided as a stream. In this case, the stream needs to be converted to base64 before passing it to the print service. For an example, have a look at the sample application in `test/incidents-app/`
+It is possible that for LargeBinaries, that you get from the database, the content is provided as a stream. In this case, the stream needs to be converted to base64 before passing it to the print service. For an example, have a look at the sample application in `test/bookshop/`
 
 ## Local Development
 
@@ -84,7 +84,7 @@ As the `hybrid` profile of the plugin uses SAP HANA Cloud to execute integration
 
 ```bash
 # Once as setup
-cd test/incidents-app
+cd test/bookshop
 cds bind -2 <print-service-instance-name> -4 local
 # Run the application (from the root)
 npm run watch-sample:local

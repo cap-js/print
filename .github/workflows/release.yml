@@ -21,7 +21,7 @@ jobs:
         run: |
           npm install
           npm run lint
-          cd test/incidents-app && npm install
+          cd test/bookshop && npm install
           cd ../..
           npm run test
 

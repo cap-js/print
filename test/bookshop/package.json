@@ -10,8 +10,5 @@
     "watch": "cds watch",
     "watch:hybrid": "cds watch --profile hybrid"
   },
-  "sapux": [
-    "app/incidents"
-  ],
   "private": true
 }
