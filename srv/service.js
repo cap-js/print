@@ -20,14 +20,12 @@ class PrintService extends cds.Service {
   applyOdataRequestOptions(queues, req) {
     let result = queues;
 
-    const orderby = req.query.SELECT.orderBy;
-    const search = req.query.SELECT.search;
-    const count = req.query.SELECT.count;
-    const top =
-      req.query.SELECT.limit && req.query.SELECT.limit.rows && req.query.SELECT.limit.rows.val;
-    const skip =
-      req.query.SELECT.limit && req.query.SELECT.limit.offset && req.query.SELECT.limit.offset.val;
-    const filter = req.query.SELECT.where;
+    const orderby = req.query?.SELECT?.orderBy;
+    const search = req.query?.SELECT?.search;
+    const count = req.query?.SELECT?.count;
+    const top = req.query?.SELECT?.limit?.rows?.val;
+    const skip = req.query?.SELECT?.limit?.offset?.val;
+    const filter = req.query?.SELECT?.where;
 
     if (filter && Array.isArray(filter) && filter.length === 3) {
       const [field, op, valueObj] = filter;
