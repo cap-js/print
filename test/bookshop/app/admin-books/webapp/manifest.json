@@ -1,7 +1,7 @@
 {
   "_version": "1.49.0",
   "sap.app": {
-    "id": "bookshop.admin-books",
+    "id": "bookshop.admin.books",
     "applicationVersion": {
       "version": "1.0.0"
     },
@@ -25,6 +25,8 @@
             "parameters": {},
             "additionalParameters": "allowed"
           },
+          "title": "{{appTitle}}",
+          "subTitle": "{{appSubTitle}}",
           "semanticObject": "Books",
           "action": "manage"
         }
