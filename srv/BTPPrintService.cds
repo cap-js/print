@@ -1,4 +1,5 @@
 @impl: './BTPPrintService.js'
+@requires: 'authenticated-user'
 service PrintService {
   entity Queues {
     key ID          : String;
