@@ -15,6 +15,7 @@ describe("Print plugin tests", () => {
       const response = await POST(`/odata/v4/catalog/Books(ID=${bookId})/CatalogService.print`, {
         copies: 1,
         qnameID: "OFFICE_PRINTER_01",
+        fileName: "file",
       });
       expect(response.status).toBe(204);
     });

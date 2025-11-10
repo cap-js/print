@@ -76,7 +76,9 @@ module.exports = async function () {
       .entries({
         ...book,
         file: templatePDF,
+        file2: templatePDF,
         fileName: `Book_${book.ID}_Summary.pdf`,
+        fileName2: `Book_${book.ID}_Summary2.pdf`,
       })
       .then(() => {
         console.log(`Inserted book ${book.ID}: ${book.title}`);

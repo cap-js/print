@@ -7,16 +7,23 @@ annotate service.Books with @(UI.Identification: [{
   Action : 'CatalogService.printBookFileManualImpl',
   Label  : '{i18n>BookManualImpl}',
   IconUrl: 'sap-icon://print'
-}]);
+}, ]);
 
 // Create a field group for the file
 annotate service.Books with @(UI.FieldGroup #PrintFileGroup: {
   $Type: 'UI.FieldGroupType',
-  Data : [{
-    $Type: 'UI.DataField',
-    Value: fileName,
-    Label: 'File Name'
-  }]
+  Data : [
+    {
+      $Type: 'UI.DataField',
+      Value: fileName,
+      Label: 'File Name'
+    },
+    {
+      $Type: 'UI.DataField',
+      Value: fileName2,
+      Label: 'File Name2'
+    }
+  ]
 });
 
 // Add the file facet to existing facets

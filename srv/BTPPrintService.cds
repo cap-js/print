@@ -21,4 +21,9 @@ service PrintService {
   }
 
   action print(request: PrintRequest) returns PrintResponse;
+
+  entity Files {
+    key entity   : String;
+    key property : String;
+  }
 }

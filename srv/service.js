@@ -2,51 +2,33 @@ const cds = require("@sap/cds");
 
 class PrintService extends cds.Service {
   async init() {
+    this.on("READ", this.entities.Files, async (req) => {
+      const entityFilterIndex = req.query.SELECT.where.findIndex(
+        (item) => typeof item === "object" && Array.isArray(item.ref) && item.ref[0] === "entity",
+      );
+      const entityName = req.query?.SELECT?.where?.[entityFilterIndex + 2]?.val;
+      if (req.query?.SELECT?.where && req.query.SELECT.where.length === 3) {
+        delete req.query.SELECT.where;
+      } else {
+        req.query.SELECT.where.splice(entityFilterIndex - 1, 4);
+      }
+      if (!entityName) return req.reject(400, "Please provide a filter to get files.");
+      if (!cds.model.definitions[entityName])
+        return req.reject(400, `Entity '${entityName}' not found in the model.`);
+
+      const elements = cds.model.definitions[entityName].elements;
+
+      const largeBinaryFields = Object.entries(elements)
+        .filter(([, def]) => def.type === "cds.LargeBinary")
+        .map(([name]) => ({ entityName, property: name }));
+
+      return this.applyOdataRequestOptions(largeBinaryFields, req);
+    });
+
     this.on("READ", this.entities.Queues, async (req) => {
       let result = await this.getQueues();
 
-      const orderby = req.query?.SELECT?.orderBy;
-      const search = req.query?.SELECT?.search;
-      const count = req.query?.SELECT?.count;
-      const top = req.query?.SELECT?.limit?.rows?.val;
-      const skip = req.query?.SELECT?.limit?.offset?.val;
-      const filter = req.query?.SELECT?.where;
-
-      if (filter && Array.isArray(filter) && filter.length === 3) {
-        const [field, op, valueObj] = filter;
-        if (!field.ref || field.ref[0] !== "ID" || op !== "=" || !valueObj.val) {
-          return req.reject(
-            400,
-            "Invalid $filter format. Expected: [{ref:['ID']}, '=', {val:'<value>'}]",
-          );
-        }
-        const filterValue = valueObj.val;
-        result = result.filter((queue) => queue.ID === filterValue);
-      } else if (search && Array.isArray(search) && search.length > 0 && search[0].val) {
-        const searchTerm = search[0].val.toLowerCase();
-        result = result.filter((queue) => queue.ID.toLowerCase().includes(searchTerm));
-        result = result.sort((a, b) => a.ID.localeCompare(b.ID));
-      }
-
-      if (orderby && Array.isArray(orderby) && orderby.length > 0) {
-        const { ref, sort } = orderby[0];
-        if (!ref || ref[0] !== "ID") {
-          return req.reject(400, "Invalid $orderby field. Only 'ID' is supported.");
-        }
-        result = result.sort((a, b) => {
-          const comparison = a.ID.localeCompare(b.ID);
-          return sort === "desc" ? -comparison : comparison;
-        });
-      }
-
-      const skipNumber = parseInt(skip || "0", 10);
-      const topNumber = parseInt(top || result.length, 10);
-      result = result.slice(skipNumber, skipNumber + topNumber);
-
-      if (count) {
-        result.$count = result.length;
-      }
-      return result;
+      return this.applyOdataRequestOptions(result, req);
     });
 
     this.on("print", async (req) => {
@@ -55,9 +37,54 @@ class PrintService extends cds.Service {
 
     super.init();
   }
-  // only works for entities as projections on queue entity defined in index.cds
-  // Use case: provide VH to FE as SAP Print service provides a REST endpoint to get queues
-  applyOdataRequestOptions(queues, req) {}
+
+  applyOdataRequestOptions(result, req) {
+    const orderby = req.query?.SELECT?.orderBy;
+    const search = req.query?.SELECT?.search;
+    const count = req.query?.SELECT?.count;
+    const top = req.query?.SELECT?.limit?.rows?.val;
+    const skip = req.query?.SELECT?.limit?.offset?.val;
+    const filter = req.query?.SELECT?.where;
+
+    if (filter && Array.isArray(filter) && filter.length === 3) {
+      const [field, op, valueObj] = filter;
+      if (!field.ref || !field.ref[0] || op !== "=" || !valueObj?.val) {
+        return req.reject(
+          400,
+          "Invalid $filter format. Expected: [{ref:['<property>']}, '=', {val:'<value>'}]",
+        );
+      }
+      const filterValue = valueObj.val;
+      result = result.filter((item) => item[field.ref[0]] === filterValue);
+    } else if (search && Array.isArray(search) && search.length > 0 && search[0].val) {
+      const searchTerm = search[0].val.toLowerCase();
+      result = result.filter((item) =>
+        item.ID !== undefined
+          ? item.ID.toLowerCase().includes(searchTerm)
+          : item.property.toLowerCase().includes(searchTerm),
+      );
+      result = result.sort((a, b) =>
+        a.ID !== undefined ? a.ID.localeCompare(b.ID) : a.property.localeCompare(b.property),
+      );
+    }
+
+    if (orderby && Array.isArray(orderby) && orderby.length > 0) {
+      const { ref, sort } = orderby[0];
+      result = result.sort((a, b) => {
+        const comparison = a[ref[0]].localeCompare(b[ref[0]]);
+        return sort === "desc" ? -comparison : comparison;
+      });
+    }
+
+    const skipNumber = parseInt(skip || "0", 10);
+    const topNumber = parseInt(top || result.length, 10);
+    result = result.slice(skipNumber, skipNumber + topNumber);
+
+    if (count) {
+      result.$count = result.length;
+    }
+    return result;
+  }
 }
 
 module.exports = PrintService;

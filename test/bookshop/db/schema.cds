@@ -2,7 +2,15 @@ using { Currency, managed, sap } from '@sap/cds/common';
 
 namespace sap.capire.bookshop;
 
-entity Books : managed {
+entity Books : managed, BooksWithOneFile {
+  // Printing field2
+  @Core.MediaType: 'application/pdf'
+  @Core.ContentDisposition: fileName
+  file2 : LargeBinary ;
+  fileName2 : String  @readonly;
+}
+
+entity BooksWithOneFile {
   key ID   : Integer;
   title    : localized String(111)  @mandatory;
   descr    : localized String(1111);

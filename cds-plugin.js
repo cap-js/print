@@ -4,8 +4,10 @@ const enhanceModel = require("./lib/enhance-csn");
 
 const PRINT_ACTION = "@PDF.Printable.Action";
 const QUEUE_ENTITY = "@PDF.Printable.QueueEntity";
+const FILE_ENTITY = "@PDF.Printable.FileEntity";
 const COPIES_ELEMENT = "copies";
 const QUEUE_ELEMENT = "qnameID";
+const FILE_ELEMENT = "fileName";
 
 cds.on("compile.for.runtime", (csn) => {
   enhanceModel(csn);
@@ -22,29 +24,41 @@ cds.once("served", async () => {
   for (let srv of cds.services) {
     // Iterate over all entities in the service
     for (let entity of srv.entities) {
-      const queueEntities = [];
       if (entity[QUEUE_ENTITY]) {
-        queueEntities.push(entity);
-      }
-      if (queueEntities.length > 0) {
-        srv.prepend(() => {
-          srv.on("READ", queueEntities, async (req) => {
+        srv.prepend(() =>
+          srv.on("READ", entity, async (req) => {
             req.target = printer.entities.Queues;
             req.query.SELECT.from.ref[0] = "PrintService.Queues";
             return await printer.run(req.query);
-          });
-        });
+          }),
+        );
+        continue;
+      }
+
+      if (entity[FILE_ENTITY]) {
+        srv.prepend(() =>
+          srv.on("READ", entity, async (req) => {
+            req.target = printer.entities.Files;
+            req.query.SELECT.from.ref[0] = "PrintService.Files";
+            return await printer.run(req.query);
+          }),
+        );
       }
 
       if (!entity.actions) continue;
 
       for (const action of entity.actions) {
         if (action[PRINT_ACTION]) {
-          const { fileNameAttribute, contentAttribute } = getPrintParamsAttributeFromEntity(entity);
+          checkPrintParamsInEntity(entity);
 
           srv.on(action.name, entity, async (req) => {
             const numberOfCopies = req.data[COPIES_ELEMENT];
             const queueID = req.data[QUEUE_ELEMENT];
+
+            const { fileNameAttribute, contentAttribute } = getPrintParamsAttribute(
+              entity,
+              req.data,
+            );
 
             const object = await SELECT.one
               .from(req.subject)
@@ -54,6 +68,7 @@ cds.once("served", async () => {
             if (!numberOfCopies)
               return req.reject(400, `Please specify number of copies to print.`);
             if (!queueID) return req.reject(400, `Please specify print queue.`);
+            if (!object[contentAttribute]) return req.reject(400, `No content found to print.`);
 
             const streamToBase64 = async (stream) => {
               const chunks = [];
@@ -89,18 +104,38 @@ cds.once("served", async () => {
   }
 });
 
-function getPrintParamsAttributeFromEntity(entity) {
-  const content = Object.values(entity.elements).find((el) => el.type === "cds.LargeBinary");
-  const fileNameAttribute = content["@Core.ContentDisposition"]["="];
+function checkPrintParamsInEntity(entity) {
+  const files = Object.values(entity.elements).filter((el) => el.type === "cds.LargeBinary");
 
-  if (!content) return cds.error("No large binary content found in the entity for printing.");
-  if (!fileNameAttribute)
-    return cds.error(
-      "No file name provided. Please add @Core.ContentDisposition to the content element.",
-    );
+  if (files.length === 0)
+    return cds.error("No large binary content found in the entity for printing.");
+
+  if (files.length === 1) return true;
+
+  files.forEach((file) => {
+    if (!file["@Core.ContentDisposition"]?.["="]) {
+      return cds.error(
+        `No file name provided. Please add @Core.ContentDisposition to the ${file.name}.`,
+      );
+    }
+  });
+
+  return true;
+}
+
+function getPrintParamsAttribute(entity, data) {
+  let fileNameAttribute, contentAttribute;
+  if (data[FILE_ELEMENT]) {
+    contentAttribute = data[FILE_ELEMENT];
+    fileNameAttribute = entity.elements[contentAttribute]["@Core.ContentDisposition"]?.["="];
+  } else {
+    const content = Object.values(entity.elements).find((el) => el.type === "cds.LargeBinary");
+    contentAttribute = content.name;
+    fileNameAttribute = content["@Core.ContentDisposition"]?.["="];
+  }
 
   return {
     fileNameAttribute,
-    contentAttribute: content.name,
+    contentAttribute,
   };
 }
