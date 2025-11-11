@@ -7,7 +7,7 @@ const QUEUE_ENTITY = "@PDF.Printable.QueueEntity";
 const FILE_ENTITY = "@PDF.Printable.FileEntity";
 const COPIES_ELEMENT = "copies";
 const QUEUE_ELEMENT = "qnameID";
-const FILE_ELEMENT = "fileName";
+const FILE_ELEMENT = "fileElement";
 
 cds.on("compile.for.runtime", (csn) => {
   enhanceModel(csn);

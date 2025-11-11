@@ -7,11 +7,12 @@ class PrintService extends cds.Service {
         (item) => typeof item === "object" && Array.isArray(item.ref) && item.ref[0] === "entity",
       );
       const entityName = req.query?.SELECT?.where?.[entityFilterIndex + 2]?.val;
-      if (!entityName) return req.reject(400, "Please provide a filter to get files.");
+      if (!entityName)
+        return req.reject(400, "Please provide a filter for the entity to get files.");
       if (req.query?.SELECT?.where && req.query.SELECT.where.length === 3) {
         delete req.query.SELECT.where;
       } else {
-        req.query.SELECT.where.splice(entityFilterIndex - 1, 4);
+        req.query.SELECT.where.splice(entityFilterIndex, 4);
       }
       if (!cds.model.definitions[entityName])
         return req.reject(400, `Entity '${entityName}' not found in the model.`);
@@ -22,7 +23,58 @@ class PrintService extends cds.Service {
         .filter(([, def]) => def.type === "cds.LargeBinary")
         .map(([name]) => ({ entityName, property: name }));
 
-      return this.applyOdataRequestOptions(largeBinaryFields, req);
+      const keyFields = Object.entries(elements)
+        .filter(([, def]) => def.key)
+        .map(([name]) => name);
+      keyFields.sort();
+
+      const keys = {};
+
+      for (let i = 0; i < keyFields.length; i++) {
+        const keyField = keyFields[i];
+        const keyFilterIndex = req.query?.SELECT?.where?.findIndex(
+          (item) =>
+            typeof item === "object" &&
+            Array.isArray(item.ref) &&
+            item.ref[0] === `entityKey${i + 1}`,
+        );
+        const keyValue = req.query?.SELECT?.where?.[keyFilterIndex + 2]?.val;
+
+        keys[keyField] = keyValue;
+
+        if (req.query?.SELECT?.where && req.query.SELECT.where.length === 3) {
+          delete req.query.SELECT.where;
+        } else {
+          req.query.SELECT.where.splice(keyFilterIndex, 4);
+        }
+      }
+
+      const fileNames = await SELECT.one
+        .from(entityName)
+        .where(keys)
+        .columns(
+          ...largeBinaryFields.map(
+            (f) =>
+              cds.model.definitions[entityName].elements[f.property]["@Core.ContentDisposition"][
+                "="
+              ] ??
+              cds.model.definitions[entityName].elements[f.property]["@Core.ContentDisposition"],
+          ),
+        );
+
+      largeBinaryFields.forEach((field) => {
+        const { entityName, property } = field;
+
+        const fileNameProp =
+          cds.model.definitions[entityName].elements[property]["@Core.ContentDisposition"]["="] ??
+          cds.model.definitions[entityName].elements[property]["@Core.ContentDisposition"];
+        field.fileName = fileNames[fileNameProp];
+        field.label = cds.i18n.labels.for(cds.model.definitions[entityName].elements[property]);
+        field.label ??= property;
+      });
+
+      const filteredFileFields = this.applyOdataRequestOptions(largeBinaryFields, req);
+      return filteredFileFields;
     });
 
     this.on("READ", this.entities.Queues, async (req) => {
@@ -68,7 +120,7 @@ class PrintService extends cds.Service {
       );
     }
 
-    if (orderby && Array.isArray(orderby) && orderby.length > 0) {
+    if (orderby && Array.isArray(orderby) && orderby.length === 1) {
       const { ref, sort } = orderby[0];
       result = result.sort((a, b) => {
         const comparison = a[ref[0]].localeCompare(b[ref[0]]);

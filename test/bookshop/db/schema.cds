@@ -4,8 +4,9 @@ namespace sap.capire.bookshop;
 
 entity Books : managed, BooksWithOneFile {
   // Printing field2
+  @Common.Label: '{i18n>Summary2} '
   @Core.MediaType: 'application/pdf'
-  @Core.ContentDisposition: fileName
+  @Core.ContentDisposition: fileName2
   file2 : LargeBinary ;
   fileName2 : String  @readonly;
 }
@@ -20,6 +21,7 @@ entity BooksWithOneFile {
   price    : Decimal;
   currency : Currency;
   // Printing field
+  @Common.Label: '{i18n>Summary} '
   @Core.MediaType: 'application/pdf'
   @Core.ContentDisposition: fileName
   file : LargeBinary ;

@@ -15,7 +15,7 @@ describe("Print plugin tests", () => {
       const response = await POST(`/odata/v4/catalog/Books(ID=${bookId})/CatalogService.print`, {
         copies: 1,
         qnameID: "OFFICE_PRINTER_01",
-        fileName: "file",
+        fileElement: "file",
       });
       expect(response.status).toBe(204);
     });
@@ -158,12 +158,50 @@ describe("Print plugin tests", () => {
       ).toBe(true);
 
       expect(annotations["CatalogService.print(CatalogService.ListOfBooks)/copies"]).toBeDefined();
-      expect(
-        annotations["CatalogService.print(CatalogService.ListOfBooks)/fileName"],
-      ).toBeDefined();
-      expect(
-        annotations["CatalogService.print(CatalogService.ListOfBooks)/fileName"]["@Common.Label"],
-      ).toBe("Print File");
+      // Check Value Help params for fileElement
+      const fileElementAnn =
+        annotations["CatalogService.print(CatalogService.ListOfBooks)/fileElement"];
+      expect(fileElementAnn["@Common.FieldControl"]).toBe("Mandatory");
+      expect(fileElementAnn["@Common.Label"]).toBe("Print File");
+      expect(fileElementAnn["@Common.ValueListWithFixedValues"]).toBe(true);
+
+      const valueList = fileElementAnn["@Common.ValueList"];
+      expect(valueList).toBeDefined();
+      expect(valueList["@type"]).toBe(
+        "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListType",
+      );
+      expect(valueList.CollectionPath).toBe("PrintServiceFiles");
+      expect(Array.isArray(valueList.Parameters)).toBe(true);
+      expect(valueList.Parameters).toHaveLength(4);
+
+      expect(valueList.Parameters[0]).toMatchObject({
+        "@type":
+          "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListParameterInOut",
+        LocalDataProperty: "fileElement",
+        ValueListProperty: "property",
+      });
+
+      expect(valueList.Parameters[1]).toMatchObject({
+        "@type":
+          "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListParameterDisplayOnly",
+        ValueListProperty: "fileName",
+      });
+
+      expect(valueList.Parameters[2]).toMatchObject({
+        "@type":
+          "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListParameterIn",
+        LocalDataProperty: "in/ID",
+        ValueListProperty: "entityKey1",
+      });
+
+      expect(valueList.Parameters[3]).toMatchObject({
+        "@type":
+          "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListParameterConstant",
+        ValueListProperty: "entity",
+        Constant: "CatalogService.ListOfBooks",
+      });
+
+      expect(fileElementAnn["@Common.Label"]).toBe("Print File");
       expect(annotations["CatalogService.print(CatalogService.ListOfBooks)/qnameID"]).toBeDefined();
       expect(
         annotations["CatalogService.print(CatalogService.ListOfBooks)/qnameID"]["@Common.Label"],
