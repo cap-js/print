@@ -42,9 +42,9 @@ entity Books as projection on my.Books;
 This annotation does the following things in the background:
 
 - Adds an action `print` to the annotated entity with the following parameters:
-  * `Queue`: Name of the print queue to use
-  * `Copies`: Number of copies to print
-  * `File`: Only added if the entity has multiple `LargeBinary` attributes. Allows selecting whicn file should be printed. Make sure the `LargeBinary` properties are annotated with `@Common.Label`
+  - `Queue`: Name of the print queue to use
+  - `Copies`: Number of copies to print
+  - `File`: Only added if the entity has multiple `LargeBinary` attributes. Allows selecting whicn file should be printed. Make sure the `LargeBinary` properties are annotated with `@Common.Label`
 - This action is added to the UI and a handler is generated to process the print request.
 - An entity `PrintServiceQueues` is added to the service to provide available print queues in a value help.
 - An entity `PrintServiceFiles` is added to the service to provide available files in a value help (only if multiple `LargeBinary` attributes exist).
