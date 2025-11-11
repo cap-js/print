@@ -9,7 +9,7 @@ describe("Print plugin tests", () => {
   });
 
   describe("Printing process", () => {
-    it("should send a print request via bound action automatically added", async () => {
+    it("should send a print request via bound action automatically added with multiple file", async () => {
       const bookId = 201;
 
       const response = await POST(`/odata/v4/catalog/Books(ID=${bookId})/CatalogService.print`, {
@@ -20,7 +20,20 @@ describe("Print plugin tests", () => {
       expect(response.status).toBe(204);
     });
 
-    it("should send a print request via bound action automatically added", async () => {
+    it("should send a print request via bound action automatically added with one file", async () => {
+      const bookId = 201;
+
+      const response = await POST(
+        `/odata/v4/catalog/BooksWithOneFile(ID=${bookId})/CatalogService.print`,
+        {
+          copies: 1,
+          qnameID: "OFFICE_PRINTER_01",
+        },
+      );
+      expect(response.status).toBe(204);
+    });
+
+    it("should send a print request via bound action manually added", async () => {
       const bookId = 201;
 
       const response = await POST(
@@ -106,6 +119,55 @@ describe("Print plugin tests", () => {
           item.Label === "Print",
       );
       expect(hasPrintAction).toBe(true);
+    });
+
+    it("should add the print action and parameters for BooksWithOneFile", async () => {
+      const annotations = metadata.CatalogService["$Annotations"];
+
+      expect(annotations["CatalogService.print(CatalogService.BooksWithOneFile)"]).toBeDefined();
+      expect(
+        annotations["CatalogService.print(CatalogService.BooksWithOneFile)"]["@PDF.Printable"],
+      ).toBeDefined();
+      expect(
+        annotations["CatalogService.print(CatalogService.BooksWithOneFile)"]["@PDF.Printable"]
+          .Action,
+      ).toBe(true);
+
+      expect(
+        annotations["CatalogService.print(CatalogService.BooksWithOneFile)/copies"],
+      ).toBeDefined();
+      expect(
+        annotations["CatalogService.print(CatalogService.BooksWithOneFile)/qnameID"],
+      ).toBeDefined();
+      expect(
+        annotations["CatalogService.print(CatalogService.BooksWithOneFile)/qnameID"][
+          "@Common.Label"
+        ],
+      ).toBe("Print Queues");
+    });
+
+    it("should add the print action and parameters for ListOfBooks (multiple files)", async () => {
+      const annotations = metadata.CatalogService["$Annotations"];
+
+      expect(annotations["CatalogService.print(CatalogService.ListOfBooks)"]).toBeDefined();
+      expect(
+        annotations["CatalogService.print(CatalogService.ListOfBooks)"]["@PDF.Printable"],
+      ).toBeDefined();
+      expect(
+        annotations["CatalogService.print(CatalogService.ListOfBooks)"]["@PDF.Printable"].Action,
+      ).toBe(true);
+
+      expect(annotations["CatalogService.print(CatalogService.ListOfBooks)/copies"]).toBeDefined();
+      expect(
+        annotations["CatalogService.print(CatalogService.ListOfBooks)/fileName"],
+      ).toBeDefined();
+      expect(
+        annotations["CatalogService.print(CatalogService.ListOfBooks)/fileName"]["@Common.Label"],
+      ).toBe("Print File");
+      expect(annotations["CatalogService.print(CatalogService.ListOfBooks)/qnameID"]).toBeDefined();
+      expect(
+        annotations["CatalogService.print(CatalogService.ListOfBooks)/qnameID"]["@Common.Label"],
+      ).toBe("Print Queues");
     });
   });
 });

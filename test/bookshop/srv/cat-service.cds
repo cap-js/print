@@ -2,16 +2,6 @@ using {sap.capire.bookshop as my} from '../db/schema';
 
 service CatalogService {
 
-  @PDF.Printable
-  entity Test {
-    key ID       : Integer;
-
-        @Core.MediaType         : 'application/pdf'
-        @Core.ContentDisposition: fileName
-        file     : LargeBinary;
-        fileName : String @readonly;
-  } actions {}
-
   /**
    * For displaying lists of Books
    */
@@ -58,7 +48,13 @@ service CatalogService {
       );
     };
 
-  entity BooksWithOneFile as projection on my.BooksWithOneFile;
+  @PDF.Printable
+  entity BooksWithOneFile as
+    projection on my.BooksWithOneFile {
+      *,
+      author.name as author
+
+    };
 
   @requires: 'authenticated-user'
   action submitOrder(book: Books:ID @mandatory,

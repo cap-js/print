@@ -16,6 +16,7 @@
   },
   "sapux": [
     "app/browse",
-    "app/admin-books"
+    "app/admin-books",
+    "app/browse-one-file"
   ]
 }
