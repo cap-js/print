@@ -29,7 +29,6 @@ To use this plugin to print documents there are two main steps:
 
 - The attribute you want to print is of type `LargeBinary`
 - This attribute has the annotation `@Core.ContentDisposition: fileName`, where `fileName` is the attribute that specifies the file name
-- TODO: Your entity only has one `LargeBinary` attribute to print
 
 ### Annotations in CDS model
 
@@ -42,9 +41,13 @@ entity Books as projection on my.Books;
 
 This annotation does the following things in the background:
 
-- Adds an action `print` to the annotated entity.
+- Adds an action `print` to the annotated entity with the following parameters:
+  * `Queue`: Name of the print queue to use
+  * `Copies`: Number of copies to print
+  * `File`: Only added if the entity has multiple `LargeBinary` attributes. Allows selecting whicn file should be printed. Make sure the `LargeBinary` properties are annotated with `@Common.Label`
 - This action is added to the UI and a handler is generated to process the print request.
 - An entity `PrintServiceQueues` is added to the service to provide available print queues in a value help.
+- An entity `PrintServiceFiles` is added to the service to provide available files in a value help (only if multiple `LargeBinary` attributes exist).
 
 ## Manual usage
 
