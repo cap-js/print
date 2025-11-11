@@ -3,16 +3,16 @@ const cds = require("@sap/cds");
 class PrintService extends cds.Service {
   async init() {
     this.on("READ", this.entities.Files, async (req) => {
-      const entityFilterIndex = req.query.SELECT.where.findIndex(
+      const entityFilterIndex = req.query?.SELECT?.where?.findIndex(
         (item) => typeof item === "object" && Array.isArray(item.ref) && item.ref[0] === "entity",
       );
       const entityName = req.query?.SELECT?.where?.[entityFilterIndex + 2]?.val;
+      if (!entityName) return req.reject(400, "Please provide a filter to get files.");
       if (req.query?.SELECT?.where && req.query.SELECT.where.length === 3) {
         delete req.query.SELECT.where;
       } else {
         req.query.SELECT.where.splice(entityFilterIndex - 1, 4);
       }
-      if (!entityName) return req.reject(400, "Please provide a filter to get files.");
       if (!cds.model.definitions[entityName])
         return req.reject(400, `Entity '${entityName}' not found in the model.`);
 
