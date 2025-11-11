@@ -1,0 +1,21 @@
+{
+  "name": "@capire/bookshop",
+  "version": "1.0.0",
+  "dependencies": {
+    "@cap-js/db-service": "^2.0.0",
+    "@cap-js/hana": "^2.0.0",
+    "@cap-js/print": "file:../../."
+  },
+  "scripts": {
+    "watch": "cds watch",
+    "watch:hybrid": "cds watch --profile hybrid"
+  },
+  "private": true,
+  "devDependencies": {
+    "cds-launchpad-plugin": "^2.2.0"
+  },
+  "sapux": [
+    "app/browse",
+    "app/admin-books"
+  ]
+}

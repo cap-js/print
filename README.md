@@ -22,78 +22,53 @@ Usage of this plugin requires a valid subscription of the [SAP Print Service](ht
 
 To use this plugin to print documents there are two main steps:
 
-1. Add required annotations to your CDS model:
-   a. Entity
-   b. Action
-2. Configure print queues to select from available options. (Optional, but recommended)
+1. Make sure your CDS model is modelled correctly
+2. Annotate your CDS model with `@PDF.Printable`
+
+### Assumptions of your model
+
+- The attribute you want to print is of type `LargeBinary`
+- This attribute has the annotation `@Core.ContentDisposition: fileName`, where `fileName` is the attribute that specifies the file name
+- TODO: Your entity only has one `LargeBinary` attribute to print
 
 ### Annotations in CDS model
 
-#### Entity
-
-First of all, the entity needs to be annotated to define the content and the name of the document to be printed.
+To use the print plugin, simply annotate your entity with `@PDF.Printable`:
 
 ```cds
-entity Incidents : cuid {
-  @print.fileContent
-  file : LargeBinary @Core.MediaType: 'application/pdf';
-  @print.fileName
-  fileName : String;
-}
-
+@PDF.Printable
+entity Books as projection on my.Books;
 ```
 
-- `@print.fileContent`: Annotates the field containing the document content to be printed.
-- `@print.fileName`: Annotates the field containing the name of the document
+This annotation does the following things in the background:
 
-#### Annotation of actions
+- Adds an action `print` to the annotated entity.
+- This action is added to the UI and a handler is generated to process the print request.
+- An entity `PrintServiceQueues` is added to the service to provide available print queues in a value help.
 
-Sending a print request works via bound actions annotated with `@print`. The parameter of the action are used to define the print job details.
+## Manual usage
 
-```cds
-service IncidentService {
-    entity Incidents as projection on db.Incidents actions {
+You can also use the print service to print documents manually, i.e. without the `@PDF.Printable` annotations and generated actions and handlers. For this, you can use the `cds.connect.to`-API of CAP to connect to the print service and invoke the `print` action manually.
 
-    @print
-    action printIncidentFile(
-          @Common: {
-              ValueListWithFixedValues,
-              ValueList: {
-                  $Type: 'Common.ValueListType',
-                  CollectionPath: 'Queues',
-                  Parameters: [{
-                      $Type: 'Common.ValueListParameterInOut',
-                      LocalDataProperty: qnameID,
-                      ValueListProperty: 'ID'
-                  }]
-              },
-              Label: 'Print Queues',
-          }
-          @print.queue
-          qnameID: String,
-          @print.numberOfCopies
-          @UI.ParameterDefaultValue : 1
-          copies: Integer
-      );
-    };
-}
+```javascript
+const printService = cds.connect.to("PrintService");
+
+await printService.send("print", {
+  qname: "Printer_Queue_Name",
+  numberOfCopies: 1,
+  docsToPrint: [
+    {
+      fileName: "file_name.pdf",
+      content: "<base64-encoded-pdf-content>",
+      isMainDocument: true,
+    },
+  ],
+});
+
+const queues = await printService.get("/Queues");
 ```
 
-- `@print`: Annotates the action that triggers the print job.
-- `@print.queue`: Annotates the parameter specifying the print queue. It is recommended to use a value help for this parameter to select from available print queues. See TOOD
-- `@print.numberOfCopies`: Annotates the parameter specifying the number of copies to print
-
-### Queues
-
-Every print request needs to specify a print queue it is send to. It is recommended to provide a value help for the print queue selection. To enbale this, define an entity as projection on the `Queues` entity provided by the print service. When this projection is in place, the plugin automatically provides the available print queues coming from the print service.
-
-```cds
-using {sap.print as sp} from '@cap-js/print';
-
-service IncidentService {
-    entity Queues as projection on sp.Queues;
-}
-```
+It is possible that for LargeBinaries, that you get from the database, the content is provided as a stream. In this case, the stream needs to be converted to base64 before passing it to the print service. For an example, have a look at the sample application in `test/bookshop/`
 
 ## Local Development
 
@@ -105,18 +80,20 @@ You can also run the application locally with a binding to the cloud print servi
 
 ### Local
 
-To set up local hybrid integration tests, run the following. The service key is created automatically.
+As the `hybrid` profile of the plugin uses SAP HANA Cloud to execute integration tests in CI, a profile `local` is added that uses can be used to execute the application locally with a binding to the cloud print service.
 
 ```bash
 # Once as setup
-cds bind -2 <print-service-instance-name>
-# Run the tests
-cds bind --exec npm run test
+cd test/bookshop
+cds bind -2 <print-service-instance-name> -4 local
+# Run the application (from the root)
+npm run watch-sample:local
+
 ```
 
 ### CI
 
-For CI, the hybrid integration tests are automatically run against a SAP Print Service instance created for testing purposes.
+For CI, the hybrid integration tests are automatically run against a SAP Print Service instance and a SAP HANA Cloud instance created for testing purposes.
 
 ## Support, Feedback, Contributing
 

@@ -33,12 +33,12 @@
     "@cap-js/sqlite": "^2"
   },
   "workspaces": [
-    "test/incidents-app/"
+    "test/bookshop/"
   ],
   "cds": {
     "requires": {
       "destinations": true,
-      "print": {
+      "PrintService": {
         "[development]": {
           "kind": "print-to-console"
         },
@@ -48,6 +48,9 @@
         "[hybrid]": {
           "kind": "print-to-service"
         },
+        "[local]": {
+          "kind": "print-to-service"
+        },
         "vcap": {
           "tag": "print"
         },
@@ -55,22 +58,21 @@
       },
       "kinds": {
         "print-to-console": {
-          "impl": "@cap-js/print/srv/printToConsole"
+          "model": "@cap-js/print/srv/localPrintService"
         },
         "print-to-service": {
-          "impl": "@cap-js/print/srv/printToPrintService"
+          "model": "@cap-js/print/srv/BTPPrintService"
         }
       }
     }
   },
   "scripts": {
     "test": "npx jest",
-    "test:hybrid": "cds bind --exec -- npx jest",
     "lint": "npx eslint --fix . --no-cache",
     "in-cap-dev": "cd node_modules && rm -fr @sap/cds* @cap-js/db-service @cap-js/sqlite",
     "prettier": "npx -y prettier@3 --write .",
     "prettier:check": "npx -y prettier@3 --check .",
-    "watch-sample": "cd test/incidents-app && cds watch",
-    "watch-sample:hybrid": "cd test/incidents-app && cds watch --profile hybrid"
+    "watch-sample": "cds watch test/bookshop",
+    "watch-sample:local": "cds watch test/bookshop --profile local"
   }
 }

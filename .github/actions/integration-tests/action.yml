@@ -63,7 +63,7 @@ runs:
           npm pkg set "overrides.@cap-js/sqlite=^1.0.0"
           npm pkg set "overrides.@cap-js/hana=^1.0.0"
           npm pkg set "overrides.@cap-js/db-service=^1.0.0"
-          cd test/incidents-app
+          cd test/bookshop
           npm pkg set "dependencies.@cap-js/hana=^1.0.0"
           npm pkg set "dependencies.@cap-js/db-service=^1.0.0"
           cd ../..
@@ -86,7 +86,7 @@ runs:
     - name: Create HDI Container
       shell: bash
       run: cf create-service hana hdi-shared cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}
-    - run: cd test/incidents-app/ && cds deploy --to hana:cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}
+    - run: cd test/bookshop/ && cds deploy --to hana:cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }}
       shell: bash
     # Bind against BTP services
     - run: cds bind db -2 cap-js-print-hana-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-$NODE_VERSION_HANA-${{ matrix.cds-version }} -o package.json
