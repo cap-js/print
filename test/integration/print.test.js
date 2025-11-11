@@ -203,7 +203,7 @@ describe("Print plugin tests", () => {
         annotations["CatalogService.print(CatalogService.BooksWithOneFile)/qnameID"][
           "@Common.Label"
         ],
-      ).toBe("Print Queue");
+      ).toBe("Print queue");
     });
 
     it("should add the print action and parameters for ListOfBooks (multiple files)", async () => {
@@ -254,7 +254,7 @@ describe("Print plugin tests", () => {
       expect(annotations["CatalogService.print(CatalogService.ListOfBooks)/qnameID"]).toBeDefined();
       expect(
         annotations["CatalogService.print(CatalogService.ListOfBooks)/qnameID"]["@Common.Label"],
-      ).toBe("Print Queue");
+      ).toBe("Print queue");
     });
   });
 });
