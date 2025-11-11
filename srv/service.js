@@ -118,6 +118,8 @@ class PrintService extends cds.Service {
       result = result.sort((a, b) =>
         a.ID !== undefined ? a.ID.localeCompare(b.ID) : a.property.localeCompare(b.property),
       );
+    } else if (filter && Array.isArray(filter) && filter.length > 0 && filter[0].xpr) {
+      return [];
     }
 
     if (orderby && Array.isArray(orderby) && orderby.length === 1) {

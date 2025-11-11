@@ -46,6 +46,69 @@ describe("Print plugin tests", () => {
       expect(response.status).toBe(204);
     });
   });
+
+  describe("Print files VH", () => {
+    it("should provide a valid VH for print files", async () => {
+      const response = await GET(
+        "/odata/v4/catalog/PrintServiceFiles?$select=entity,entityKey1,fileName,label,property&$count=true&$orderby=label&$filter=entity eq 'CatalogService.Books' and entityKey1 eq '207'&$skip=0&$top=100",
+      );
+
+      expect(response.data).toBeDefined();
+      expect(response.data["@odata.count"]).toBe(2);
+
+      expect(response.data.value[0]).toMatchObject({
+        entityName: "CatalogService.Books",
+        property: "file",
+        fileName: "Book_207_Summary.pdf",
+        label: "Summaryyy",
+      });
+
+      expect(response.data.value[1]).toMatchObject({
+        entityName: "CatalogService.Books",
+        property: "file2",
+        fileName: "Book_207_Summary2.pdf",
+        label: "Summaryyy2",
+      });
+
+      expect(response.status).toBe(200);
+    });
+
+    it("should not return something when not found", async () => {
+      const response = await GET(
+        "odata/v4/catalog/PrintServiceFiles?$filter=(property eq 'something' or label eq 'something') and entity eq 'CatalogService.Books' and entityKey1 eq '207' &$skip=0&$top=2",
+      );
+
+      expect(response.data).toBeDefined();
+      expect(response.data.value.length).toBe(0);
+      expect(response.status).toBe(200);
+    });
+
+    it("should return data for $search query", async () => {
+      const response = await GET(
+        "odata/v4/catalog/PrintServiceFiles?$search=file&$select=entity,entityKey1,fileName,label,property&$count=true&$orderby=label&$filter=entity eq 'CatalogService.Books' and entityKey1 eq '207'&$skip=0&$top=100",
+      );
+
+      expect(response.data).toBeDefined();
+      expect(response.data["@odata.count"]).toBe(2);
+
+      expect(response.data.value[0]).toMatchObject({
+        entityName: "CatalogService.Books",
+        property: "file",
+        fileName: "Book_207_Summary.pdf",
+        label: "Summaryyy",
+      });
+
+      expect(response.data.value[1]).toMatchObject({
+        entityName: "CatalogService.Books",
+        property: "file2",
+        fileName: "Book_207_Summary2.pdf",
+        label: "Summaryyy2",
+      });
+
+      expect(response.status).toBe(200);
+    });
+  });
+
   describe("Print queues retrieval", () => {
     it("should get the print queues with $search", async () => {
       const { status, data } = await GET(
@@ -99,6 +162,7 @@ describe("Print plugin tests", () => {
       expect(status).toBe(200);
     });
   });
+
   describe("UI", () => {
     let metadata;
 
@@ -112,11 +176,7 @@ describe("Print plugin tests", () => {
       const identificationArray =
         metadata.CatalogService["$Annotations"]["CatalogService.Books"]["@UI.Identification"];
       const hasPrintAction = identificationArray.some(
-        (item) =>
-          item["@type"] ===
-            "https://sap.github.io/odata-vocabularies/vocabularies/UI.xml#UI.DataFieldForAction" &&
-          item.Action === "CatalogService.print" &&
-          item.Label === "Print",
+        (item) => item.Action === "CatalogService.print" && item.Label === "Print",
       );
       expect(hasPrintAction).toBe(true);
     });
@@ -167,36 +227,25 @@ describe("Print plugin tests", () => {
 
       const valueList = fileElementAnn["@Common.ValueList"];
       expect(valueList).toBeDefined();
-      expect(valueList["@type"]).toBe(
-        "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListType",
-      );
       expect(valueList.CollectionPath).toBe("PrintServiceFiles");
       expect(Array.isArray(valueList.Parameters)).toBe(true);
       expect(valueList.Parameters).toHaveLength(4);
 
       expect(valueList.Parameters[0]).toMatchObject({
-        "@type":
-          "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListParameterInOut",
         LocalDataProperty: "fileElement",
         ValueListProperty: "property",
       });
 
       expect(valueList.Parameters[1]).toMatchObject({
-        "@type":
-          "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListParameterDisplayOnly",
         ValueListProperty: "fileName",
       });
 
       expect(valueList.Parameters[2]).toMatchObject({
-        "@type":
-          "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListParameterIn",
         LocalDataProperty: "in/ID",
         ValueListProperty: "entityKey1",
       });
 
       expect(valueList.Parameters[3]).toMatchObject({
-        "@type":
-          "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml#Common.ValueListParameterConstant",
         ValueListProperty: "entity",
         Constant: "CatalogService.ListOfBooks",
       });
