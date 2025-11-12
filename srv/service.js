@@ -7,14 +7,14 @@ class PrintService extends cds.Service {
         (item) => typeof item === "object" && Array.isArray(item.ref) && item.ref[0] === "entity",
       );
       const entityName = req.query?.SELECT?.where?.[entityFilterIndex + 2]?.val;
-      if (!entityName) return req.reject({ status: 400, message: PRINT_PROVIDE_FILTER });
+      if (!entityName) return req.reject({ status: 400, message: "PRINT_PROVIDE_FILTER" });
       if (req.query?.SELECT?.where && req.query.SELECT.where.length === 3) {
         delete req.query.SELECT.where;
       } else {
         req.query.SELECT.where.splice(entityFilterIndex, 4);
       }
       if (!cds.model.definitions[entityName])
-        return req.reject({ status: 404, message: PRINT_ENTITY_NOT_FOUND, args: [entityName] });
+        return req.reject({ status: 404, message: "PRINT_ENTITY_NOT_FOUND", args: [entityName] });
 
       const elements = cds.model.definitions[entityName].elements;
 
@@ -102,7 +102,7 @@ class PrintService extends cds.Service {
       if (!field.ref || !field.ref[0] || op !== "=" || !valueObj?.val) {
         return req.reject({
           status: 400,
-          message: PRINT_INVALID_FILTER_FORMAT,
+          message: "PRINT_INVALID_FILTER_FORMAT",
         });
       }
       const filterValue = valueObj.val;
