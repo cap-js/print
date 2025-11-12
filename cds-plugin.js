@@ -9,6 +9,8 @@ const COPIES_ELEMENT = "copies";
 const QUEUE_ELEMENT = "qnameID";
 const FILE_ELEMENT = "fileElement";
 
+const LOG = cds.log("print");
+
 cds.on("compile.for.runtime", (csn) => {
   enhanceModel(csn);
 });
@@ -64,11 +66,12 @@ cds.once("served", async () => {
               .from(req.subject)
               .columns([fileNameAttribute, contentAttribute]);
 
-            if (!object) return req.reject(404, `Object not found for printing.`);
+            if (!object) return req.reject({ status: 404, message: "PRINT_OBJECT_NOT_FOUND" });
             if (!numberOfCopies)
-              return req.reject(400, `Please specify number of copies to print.`);
-            if (!queueID) return req.reject(400, `Please specify print queue.`);
-            if (!object[contentAttribute]) return req.reject(400, `No content found to print.`);
+              return req.reject({ status: 400, message: "PRINT_SPECIFY_COPIES" });
+            if (!queueID) return req.reject({ status: 400, message: "PRINT_SPECIFY_QUEUE" });
+            if (!object[contentAttribute])
+              return req.reject({ status: 400, message: "PRINT_NO_CONTENT" });
 
             const streamToBase64 = async (stream) => {
               const chunks = [];
@@ -92,10 +95,12 @@ cds.once("served", async () => {
 
               return req.info({
                 status: 200,
-                message: `Print job for file ${object[fileNameAttribute]} sent to queue ${queueID} for ${numberOfCopies} copies.`,
+                message: "PRINT_JOB_SENT",
+                args: [object[fileNameAttribute], queueID],
               });
             } catch (error) {
-              return req.reject(500, `Error: ${error.message ?? "Unknown error"}`);
+              LOG.error("Print error:", error);
+              return req.reject({ status: 500, message: "PRINT_UNKNOWN_ERROR" });
             }
           });
         }
