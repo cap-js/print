@@ -222,7 +222,7 @@ describe("Print plugin tests", () => {
       const fileElementAnn =
         annotations["CatalogService.print(CatalogService.ListOfBooks)/fileElement"];
       expect(fileElementAnn["@Common.FieldControl"]).toBe("Mandatory");
-      expect(fileElementAnn["@Common.Label"]).toBe("Print File");
+      expect(fileElementAnn["@Common.Label"]).toBe("Print file");
       expect(fileElementAnn["@Common.ValueListWithFixedValues"]).toBe(true);
 
       const valueList = fileElementAnn["@Common.ValueList"];
@@ -250,7 +250,7 @@ describe("Print plugin tests", () => {
         Constant: "CatalogService.ListOfBooks",
       });
 
-      expect(fileElementAnn["@Common.Label"]).toBe("Print File");
+      expect(fileElementAnn["@Common.Label"]).toBe("Print file");
       expect(annotations["CatalogService.print(CatalogService.ListOfBooks)/qnameID"]).toBeDefined();
       expect(
         annotations["CatalogService.print(CatalogService.ListOfBooks)/qnameID"]["@Common.Label"],
