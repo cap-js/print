@@ -71,16 +71,29 @@ module.exports = async function () {
     },
   ];
 
-  const insertPromises = newBooks.map((book) =>
-    INSERT.into("Books")
-      .entries({
-        ...book,
-        file: templatePDF,
-        fileName: `Book_${book.ID}_Summary.pdf`,
-      })
-      .then(() => {
-        console.log(`Inserted book ${book.ID}: ${book.title}`);
-      }),
-  );
+  const insertPromises = newBooks.map((book) => {
+    return [
+      INSERT.into("Books")
+        .entries({
+          ...book,
+          file: templatePDF,
+          file2: templatePDF,
+          fileName: `Book_${book.ID}_Summary.pdf`,
+          fileName2: `Book_${book.ID}_Summary2.pdf`,
+        })
+        .then(() => {
+          console.log(`Inserted book ${book.ID}: ${book.title}`);
+        }),
+      INSERT.into("BooksWithOneFile")
+        .entries({
+          ...book,
+          file: templatePDF,
+          fileName: `Book_${book.ID}_Summary.pdf`,
+        })
+        .then(() => {
+          console.log(`Inserted book ${book.ID}: ${book.title}`);
+        }),
+    ];
+  });
   await Promise.all(insertPromises);
 };

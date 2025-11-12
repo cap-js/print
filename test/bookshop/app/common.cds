@@ -10,9 +10,9 @@ using {
 
 ////////////////////////////////////////////////////////////////////////////
 //
-//	Books Lists
+//	BooksWithOneFile Lists
 //
-annotate my.Books with @(
+annotate my.BooksWithOneFile with @(
   Common.SemanticKey: [ID],
   UI                : {
     Identification : [{Value: title}],
@@ -39,7 +39,7 @@ annotate my.Books with @(
   }
 ) {
   ID     @Common          : {
-    SemanticObject : 'Books',
+    SemanticObject : 'BooksWithOneFile',
     Text           : title,
     TextArrangement: #TextOnly
   };
@@ -53,9 +53,9 @@ annotate Currencies with {
 
 ////////////////////////////////////////////////////////////////////////////
 //
-//	Books Elements
+//	BooksWithOneFile Elements
 //
-annotate my.Books with {
+annotate my.BooksWithOneFile with {
   ID      @title: '{i18n>ID}';
   title   @title: '{i18n>Title}';
   genre   @title: '{i18n>Genre}'        @Common              : {

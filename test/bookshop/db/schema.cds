@@ -2,7 +2,17 @@ using { Currency, managed, sap } from '@sap/cds/common';
 
 namespace sap.capire.bookshop;
 
-entity Books : managed {
+entity Books : managed, BooksWithOneFile {
+  // Printing field2
+  @Common.Label: '{i18n>Summary2} '
+  @Core.MediaType: 'application/pdf'
+  @Core.ContentDisposition: fileName2
+  file2 : LargeBinary ;
+  @Common.Label: '{i18n>Summary2} '
+  fileName2 : String  @readonly;
+}
+
+entity BooksWithOneFile {
   key ID   : Integer;
   title    : localized String(111)  @mandatory;
   descr    : localized String(1111);
@@ -12,9 +22,11 @@ entity Books : managed {
   price    : Decimal;
   currency : Currency;
   // Printing field
+  @Common.Label: '{i18n>Summary} '
   @Core.MediaType: 'application/pdf'
   @Core.ContentDisposition: fileName
   file : LargeBinary ;
+  @Common.Label: '{i18n>Summary} '
   fileName : String  @readonly;
 }
 

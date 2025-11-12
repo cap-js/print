@@ -6,7 +6,7 @@ service CatalogService {
    * For displaying lists of Books
    */
   @readonly
-  entity ListOfBooks as
+  entity ListOfBooks      as
     projection on Books
     excluding {
       descr
@@ -17,7 +17,7 @@ service CatalogService {
    */
   @readonly
   @PDF.Printable
-  entity Books       as
+  entity Books            as
     projection on my.Books {
       *,
       author.name as author
@@ -31,21 +31,29 @@ service CatalogService {
                                      @Common: {
                                        ValueListWithFixedValues,
                                        ValueList: {
-                                         $Type: 'Common.ValueListType',
+                                         $Type         : 'Common.ValueListType',
                                          CollectionPath: 'PrintServiceQueues',
-                                         Parameters: [{
-                                           $Type: 'Common.ValueListParameterInOut',
+                                         Parameters    : [{
+                                           $Type            : 'Common.ValueListParameterInOut',
                                            LocalDataProperty: qnameID,
                                            ValueListProperty: 'ID'
                                          }]
                                        },
-                                       Label: 'Print Queues',
+                                       Label    : 'Print Queues',
                                      }
                                      qnameID: String,
                                      @UI.ParameterDefaultValue: 1
                                      copies: Integer
 
-      )
+      );
+    };
+
+  @PDF.Printable
+  entity BooksWithOneFile as
+    projection on my.BooksWithOneFile {
+      *,
+      author.name as author
+
     };
 
   @requires: 'authenticated-user'
