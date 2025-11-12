@@ -117,8 +117,9 @@ class PrintService extends cds.Service {
       result = result.sort((a, b) =>
         a.ID !== undefined ? a.ID.localeCompare(b.ID) : a.property.localeCompare(b.property),
       );
-    } else if (filter && Array.isArray(filter) && filter.length > 0 && filter[0].xpr) {
-      return [];
+    } else if (filter && Array.isArray(filter) && filter.length > 0 && filter) {
+      result = result.filter((item) => this.evalXpr(filter, item));
+      return result;
     }
 
     if (orderby && Array.isArray(orderby) && orderby.length === 1) {
@@ -136,6 +137,67 @@ class PrintService extends cds.Service {
     if (count) {
       result.$count = result.length;
     }
+    return result;
+  }
+
+  evalXpr(xpr, item) {
+    function evalRec(expr, index = 0) {
+      if (expr[index] && typeof expr[index] === "object" && Array.isArray(expr[index].xpr)) {
+        const [result, _] = evalRec(expr[index].xpr, 0);
+
+        const newExpr = [...expr.slice(0, index), result, ...expr.slice(index + 1)];
+        return evalRec(newExpr, index);
+      }
+
+      if (typeof expr[index] === "object" && expr[index].ref) {
+        const left = item[expr[index].ref[0]];
+        const op = expr[index + 1];
+        const right = expr[index + 2]?.val;
+        let res = false;
+        switch (op) {
+          case "=":
+            res = left === right;
+            break;
+          case "!=":
+            res = left !== right;
+            break;
+          case ">":
+            res = left > right;
+            break;
+          case "<":
+            res = left < right;
+            break;
+          case ">=":
+            res = left >= right;
+            break;
+          case "<=":
+            res = left <= right;
+            break;
+          default:
+            res = false;
+        }
+
+        if (
+          index + 3 < expr.length &&
+          typeof expr[index + 3] === "string" &&
+          (expr[index + 3] === "and" || expr[index + 3] === "or")
+        ) {
+          const logic = expr[index + 3];
+          const [rightRes, finalIdx] = evalRec(expr, index + 4);
+          return [logic === "and" ? res && rightRes : res || rightRes, finalIdx];
+        }
+
+        return [res, index + 3];
+      }
+
+      if (typeof expr[index] === "boolean") {
+        return [expr[index], index + 1];
+      }
+
+      return evalRec(expr, index + 1);
+    }
+
+    const [result] = evalRec(xpr, 0);
     return result;
   }
 }

@@ -73,13 +73,63 @@ describe("Print plugin tests", () => {
       expect(response.status).toBe(200);
     });
 
-    it("should not return something when not found", async () => {
+    it("should not return something when filter is not applicable", async () => {
       const response = await GET(
         "odata/v4/catalog/PrintServiceFiles?$filter=(property eq 'something' or label eq 'something') and entity eq 'CatalogService.Books' and entityKey1 eq '207' &$skip=0&$top=2",
       );
 
       expect(response.data).toBeDefined();
       expect(response.data.value.length).toBe(0);
+      expect(response.status).toBe(200);
+    });
+
+    it("should return something when filter is applicable with or", async () => {
+      const response = await GET(
+        "odata/v4/catalog/PrintServiceFiles?$filter=(property eq 'file' or label eq 'something') and entity eq 'CatalogService.Books' and entityKey1 eq '207' &$skip=0&$top=2",
+      );
+
+      expect(response.data).toBeDefined();
+      expect(response.data.value.length).toBe(1);
+      expect(response.status).toBe(200);
+    });
+
+    it("should return something when filter is applicable with or other way round", async () => {
+      const response = await GET(
+        "odata/v4/catalog/PrintServiceFiles?$filter=(property eq 'something' or label eq 'Summaryyy') and entity eq 'CatalogService.Books' and entityKey1 eq '207' &$skip=0&$top=2",
+      );
+
+      expect(response.data).toBeDefined();
+      expect(response.data.value.length).toBe(1);
+      expect(response.status).toBe(200);
+    });
+
+    it("should return something when filter is applicable with and", async () => {
+      const response = await GET(
+        "odata/v4/catalog/PrintServiceFiles?$filter=(property eq 'file' and label eq 'Summaryyy') and entity eq 'CatalogService.Books' and entityKey1 eq '207' &$skip=0&$top=2",
+      );
+
+      expect(response.data).toBeDefined();
+      expect(response.data.value.length).toBe(1);
+      expect(response.status).toBe(200);
+    });
+
+    it("should return something when filter is deeply nested", async () => {
+      const response = await GET(
+        "odata/v4/catalog/PrintServiceFiles?$filter=((((property eq 'file') and (label eq 'Summaryyy')))) and entity eq 'CatalogService.Books' and entityKey1 eq '207' &$skip=0&$top=2",
+      );
+
+      expect(response.data).toBeDefined();
+      expect(response.data.value.length).toBe(1);
+      expect(response.status).toBe(200);
+    });
+
+    it("should return something when filter is even more deeply nested", async () => {
+      const response = await GET(
+        "odata/v4/catalog/PrintServiceFiles?$filter=((((property eq 'file') and (label eq 'nope')) or (label eq 'Summaryyy'))) and entity eq 'CatalogService.Books' and entityKey1 eq '207' &$skip=0&$top=2",
+      );
+
+      expect(response.data).toBeDefined();
+      expect(response.data.value.length).toBe(1);
       expect(response.status).toBe(200);
     });
 
