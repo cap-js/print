@@ -39,7 +39,7 @@ service PrintService {
   }
   @title: '{i18n>PRINT_FILES}'
   entity Files {
-        @title: '{i18n>ENTITY}'
+        @title: '{i18n>OBJECT}'
     key entity      : String;
 
         @Common.Text: label  @Common.TextArrangement: #TextOnly  @title: '{i18n>PROPERTY}'
@@ -51,34 +51,34 @@ service PrintService {
         @title: '{i18n>LABEL}'
         label       : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey1  : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey2  : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey3  : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey4  : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey5  : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey6  : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey7  : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey8  : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey9  : String;
 
-        @title: '{i18n>ENTITY_KEY}'
+        @title: '{i18n>OBJECT_KEY}'
         entityKey10 : String;
   }
 }

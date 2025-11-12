@@ -14,7 +14,7 @@ class PrintService extends cds.Service {
         req.query.SELECT.where.splice(entityFilterIndex, 4);
       }
       if (!cds.model.definitions[entityName])
-        return req.reject({ status: 404, message: "PRINT_ENTITY_NOT_FOUND", args: [entityName] });
+        return req.reject({ status: 404, message: "PRINT_OBJECT_NOT_FOUND", args: [entityName] });
 
       const elements = cds.model.definitions[entityName].elements;
 
