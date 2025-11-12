@@ -8,6 +8,7 @@ entity Books : managed, BooksWithOneFile {
   @Core.MediaType: 'application/pdf'
   @Core.ContentDisposition: fileName2
   file2 : LargeBinary ;
+  @Common.Label: '{i18n>Summary2} '
   fileName2 : String  @readonly;
 }
 
@@ -25,6 +26,7 @@ entity BooksWithOneFile {
   @Core.MediaType: 'application/pdf'
   @Core.ContentDisposition: fileName
   file : LargeBinary ;
+  @Common.Label: '{i18n>Summary} '
   fileName : String  @readonly;
 }
 

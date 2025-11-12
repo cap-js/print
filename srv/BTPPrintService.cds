@@ -16,6 +16,7 @@ service PrintService {
     qname          : String;
     @title : '{i18n>NUMBER_OF_COPIES}'
     numberOfCopies : Integer;
+    @title : '{i18n>DOCUMENTS_TO_PRINT}'
     docsToPrint    : many {
       isMainDocument : Boolean;
       fileName       : String;
@@ -24,16 +25,19 @@ service PrintService {
   }
 
   type PrintResponse {
+    @title : '{i18n>TASK_ID}'
     taskId : String;
   }
 
   action print(request: PrintRequest) returns PrintResponse;
 
   entity Files {
+    @title : '{i18n>ENTITY}'
     key entity      : String;
 
-        @Common.Text: label  @Common.TextArrangement: #TextOnly
+        @Common.Text: label  @Common.TextArrangement: #TextOnly @title: '{i18n>PROPERTY}'
     key property    : String;
+        @title      : '{i18n>FILE_NAME}'
         fileName    : String;
         label       : String;
         entityKey1  : String;
