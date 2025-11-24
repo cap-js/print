@@ -11,15 +11,7 @@ const FILE_ELEMENT = "fileElement";
 
 const LOG = cds.log("print");
 
-cds.on("compile.for.runtime", (csn) => {
-  enhanceModel(csn);
-});
-cds.on("compile.to.edmx", (csn) => {
-  enhanceModel(csn);
-});
-cds.on("compile.to.dbx", (csn) => {
-  enhanceModel(csn);
-});
+cds.on("loaded", enhanceModel);
 
 cds.once("served", async () => {
   const printer = await cds.connect.to("PrintService");
