@@ -58,7 +58,12 @@ cds.once("served", async () => {
               .from(req.subject)
               .columns([fileNameAttribute, contentAttribute]);
 
-            if (!object) return req.reject({ status: 404, message: "PRINT_OBJECT_NOT_FOUND" });
+            if (!object)
+              return req.reject({
+                status: 404,
+                message: "PRINT_OBJECT_NOT_FOUND",
+                args: [cds.i18n.labels.for(req.target) ?? req.target.name],
+              });
             if (!numberOfCopies)
               return req.reject({ status: 400, message: "PRINT_SPECIFY_COPIES" });
             if (!queueID) return req.reject({ status: 400, message: "PRINT_SPECIFY_QUEUE" });
