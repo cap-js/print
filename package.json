@@ -10,7 +10,9 @@
   "files": [
     "index.cds",
     "lib",
-    "srv"
+    "srv",
+    "LICENSES",
+    "_i18n"
   ],
   "keywords": [
     "sap",
