@@ -4,17 +4,13 @@
 
 ## About this project
 
-CDS plugin for SAP Print service (package `@cap-js/print`) is a CDS plugin providing print service features through integration with [SAP Print Service](https://api.sap.com/api/PRINTAPI/overview).
+CDS plugin for SAP Print service (package `@cap-js/print`) is a CDS plugin that provides print service features through integration with the [SAP Print Service](https://api.sap.com/api/PRINTAPI/overview).
 
 ## Table of Contents
 
-- [About this project](#about-this-project)
-- [Requirements](#requirements)
-- [Setup](#setup)
 
 ## Requirements and Setup
 
-See [Getting Started](https://cap.cloud.sap/docs/get-started) on how to jumpstart your development and grow as you go with SAP Cloud Application Programming Model.
 
 Usage of this plugin requires a valid subscription of the [SAP Print Service](https://help.sap.com/docs/SCP_PRINT_SERVICE).
 
@@ -22,13 +18,13 @@ Usage of this plugin requires a valid subscription of the [SAP Print Service](ht
 
 To use this plugin to print documents there are two main steps:
 
-1. Make sure your CDS model is modelled correctly
+1. Ensure your model meets the requirements
 2. Annotate your CDS model with `@PDF.Printable`
 
-### Assumptions of your model
+### Model requirements 
 
-- The attribute you want to print is of type `LargeBinary`
-- This attribute has the annotation `@Core.ContentDisposition: fileName`, where `fileName` is the attribute that specifies the file name
+- The attribute(s) you want to print is of type `LargeBinary`
+- Those attributes have the annotation `@Core.ContentDisposition: fileName`, where `fileName` is the attribute that specifies the file name or a hardcoded string with the file name
 
 ### Annotations in CDS model
 
@@ -44,14 +40,21 @@ This annotation does the following things in the background:
 - Adds an action `print` to the annotated entity with the following parameters:
   - `Queue`: Name of the print queue to use
   - `Copies`: Number of copies to print
-  - `File`: Only added if the entity has multiple `LargeBinary` attributes. Allows selecting whicn file should be printed. Make sure the `LargeBinary` properties are annotated with `@Common.Label`
+  - `File`: Only added if the entity has multiple `LargeBinary` attributes. Allows selecting which file should be printed. Ensure that the `LargeBinary` properties are annotated with `@Common.Label`
 - This action is added to the UI and a handler is generated to process the print request.
 - An entity `PrintServiceQueues` is added to the service to provide available print queues in a value help.
 - An entity `PrintServiceFiles` is added to the service to provide available files in a value help (only if multiple `LargeBinary` attributes exist).
 
-## Manual usage
+## Manual Usage
 
-You can also use the print service to print documents manually, i.e. without the `@PDF.Printable` annotations and generated actions and handlers. For this, you can use the `cds.connect.to`-API of CAP to connect to the print service and invoke the `print` action manually.
+You can also use the print service to print documents manually, i.e., without the `@PDF.Printable` annotations and generated actions and handlers.
+
+Use cases for a manual approach could be:
+- You want to print documents that are not part of your CDS model, i.e., files generated at runtime
+- Your model does not meet the requirements for the automatic approach
+- You want to print another file type than PDF
+
+For this, you can use the `cds.connect.to`-API of CAP to connect to the print service and invoke the `print` action manually.
 
 ```javascript
 const printService = cds.connect.to("PrintService");
@@ -71,7 +74,7 @@ await printService.send("print", {
 const queues = await printService.get("/Queues");
 ```
 
-It is possible that for LargeBinaries, that you get from the database, the content is provided as a stream. In this case, the stream needs to be converted to base64 before passing it to the print service. For an example, have a look at the sample application in `test/bookshop/`
+It is possible that for LargeBinaries retrieved from the database, the content is provided as a stream. In this case, the stream needs to be converted to base64 before passing it to the print service. For example, have a look at the sample application in `test/bookshop/`
 
 ## Local Development
 
@@ -83,7 +86,7 @@ You can also run the application locally with a binding to the cloud print servi
 
 ### Local
 
-As the `hybrid` profile of the plugin uses SAP HANA Cloud to execute integration tests in CI, a profile `local` is added that uses can be used to execute the application locally with a binding to the cloud print service.
+As the `hybrid` profile of the plugin uses SAP HANA Cloud to execute integration tests in CI, a profile `local` is added that can be used to execute the application locally with a binding to the cloud print service.
 
 ```bash
 # Once as setup
@@ -104,7 +107,7 @@ This project is open to feature requests/suggestions, bug reports etc. via [GitH
 
 ## Security / Disclosure
 
-If you find any bug that may be a security problem, please follow our instructions at [in our security policy](https://github.com/cap-js/print/security/policy) on how to report it. Please do not create GitHub issues for security-related doubts or problems.
+If you find any bug that may be a security problem, please follow the instructions [in our security policy](https://github.com/cap-js/print/security/policy) on how to report it. Please do not create GitHub issues for security-related doubts or problems.
 
 ## Code of Conduct
 
@@ -112,4 +115,4 @@ We as members, contributors, and leaders pledge to make participation in our com
 
 ## Licensing
 
-Copyright 2025 SAP SE or an SAP affiliate company and print contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/cap-js/print).
+Copyright 2025 SAP SE or an SAP affiliate company and print contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information, including third-party components and their licensing/copyright information, is available [via the REUSE tool](https://api.reuse.software/info/github.com/cap-js/print).
