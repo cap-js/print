@@ -49,9 +49,9 @@ You can also use the print service to print documents manually, i.e., without th
 
 Use cases for a manual approach could be:
 
-- You want to print documents that are not part of your CDS model, i.e., files generated at runtime
-- Your model does not meet the requirements for the automatic approach
-- You want to print a file type other than PDF
+- You want to print documents that are not part of your CDS model, i.e., files generated at runtime.
+- Your model does not meet the requirements for the automatic approach.
+- You want to print a file type other than PDF.
 
 For this, you can use the `cds.connect.to` API of CAP to connect to the print service and invoke the `print` action manually.
 
