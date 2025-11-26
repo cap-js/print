@@ -16,14 +16,14 @@ Usage of this plugin requires a valid subscription of the [SAP Print Service](ht
 
 ## Usage
 
-To use this plugin to print documents there are two main steps:
+To use this plugin to print documents, there are two main steps:
 
 1. Ensure your model meets the requirements
 2. Annotate your CDS model with `@PDF.Printable`
 
 ### Model requirements 
 
-- The attribute(s) you want to print is of type `LargeBinary`
+- The attribute(s) you want to print are of type `LargeBinary`
 - Those attributes have the annotation `@Core.ContentDisposition: fileName`, where `fileName` is the attribute that specifies the file name or a hardcoded string with the file name
 
 ### Annotations in CDS model
@@ -40,7 +40,7 @@ This annotation does the following things in the background:
 - Adds an action `print` to the annotated entity with the following parameters:
   - `Queue`: Name of the print queue to use
   - `Copies`: Number of copies to print
-  - `File`: Only added if the entity has multiple `LargeBinary` attributes. Allows selecting which file should be printed. Ensure that the `LargeBinary` properties are annotated with `@Common.Label`
+  - `File`: Only added if the entity has multiple `LargeBinary` attributes. Allows selecting which file should be printed. Ensure that the `LargeBinary` properties are annotated with `@Common.Label`.
 - This action is added to the UI and a handler is generated to process the print request.
 - An entity `PrintServiceQueues` is added to the service to provide available print queues in a value help.
 - An entity `PrintServiceFiles` is added to the service to provide available files in a value help (only if multiple `LargeBinary` attributes exist).
@@ -54,7 +54,7 @@ Use cases for a manual approach could be:
 - Your model does not meet the requirements for the automatic approach
 - You want to print another file type than PDF
 
-For this, you can use the `cds.connect.to`-API of CAP to connect to the print service and invoke the `print` action manually.
+For this, you can use the `cds.connect.to` API of CAP to connect to the print service and invoke the `print` action manually.
 
 ```javascript
 const printService = cds.connect.to("PrintService");
@@ -78,7 +78,7 @@ It is possible that for LargeBinaries retrieved from the database, the content i
 
 ## Local Development
 
-When running the application locally, i.e. `cds watch`, the print service is mocked. This mock implementation prints the print job details to the console instead of sending it to the actual print service. It also provides a number of sample print queues for selection.
+When running the application locally, i.e., `cds watch`, the print service is mocked. This mock implementation prints the print job details to the console instead of sending them to the actual print service. It also provides a number of sample print queues for selection.
 
 ## Hybrid Testing
 
@@ -103,7 +103,7 @@ For CI, the hybrid integration tests are automatically run against a SAP Print S
 
 ## Support, Feedback, Contributing
 
-This project is open to feature requests/suggestions, bug reports etc. via [GitHub issues](https://github.com/cap-js/print/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
+This project is open to feature requests/suggestions, bug reports, etc. via [GitHub issues](https://github.com/cap-js/print/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
 
 ## Security / Disclosure
 
