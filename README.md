@@ -8,7 +8,6 @@ CDS plugin for SAP Print service (package `@cap-js/print`) is a CDS plugin that 
 
 ## Table of Contents
 
-
 ## Requirements and Setup
 
 Using this plugin requires a valid subscription of the [SAP Print Service](https://help.sap.com/docs/SCP_PRINT_SERVICE).
@@ -20,7 +19,7 @@ To use this plugin to print documents, there are two main steps:
 1. Ensure your model meets the requirements
 2. Annotate your CDS model with `@PDF.Printable`
 
-### Model Requirements 
+### Model Requirements
 
 - The attribute(s) you want to print are of type `LargeBinary`
 - Those attributes have the annotation `@Core.ContentDisposition: fileName`, where `fileName` is the attribute that specifies the file name or a hardcoded string with the file name
@@ -49,6 +48,7 @@ This annotation does the following things in the background:
 You can also use the print service to print documents manually, i.e., without the `@PDF.Printable` annotations and generated actions and handlers.
 
 Use cases for a manual approach could be:
+
 - You want to print documents that are not part of your CDS model, i.e., files generated at runtime
 - Your model does not meet the requirements for the automatic approach
 - You want to print a file type other than PDF
