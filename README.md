@@ -11,8 +11,7 @@ CDS plugin for SAP Print service (package `@cap-js/print`) is a CDS plugin that 
 
 ## Requirements and Setup
 
-
-Usage of this plugin requires a valid subscription of the [SAP Print Service](https://help.sap.com/docs/SCP_PRINT_SERVICE).
+Using this plugin requires a valid subscription of the [SAP Print Service](https://help.sap.com/docs/SCP_PRINT_SERVICE).
 
 ## Usage
 
@@ -21,14 +20,14 @@ To use this plugin to print documents, there are two main steps:
 1. Ensure your model meets the requirements
 2. Annotate your CDS model with `@PDF.Printable`
 
-### Model requirements 
+### Model Requirements 
 
 - The attribute(s) you want to print are of type `LargeBinary`
 - Those attributes have the annotation `@Core.ContentDisposition: fileName`, where `fileName` is the attribute that specifies the file name or a hardcoded string with the file name
 
 ### Annotations in CDS model
 
-To use the print plugin, simply annotate your entity with `@PDF.Printable`:
+To use the print plugin, annotate your entity with `@PDF.Printable`:
 
 ```cds
 @PDF.Printable
@@ -38,8 +37,8 @@ entity Books as projection on my.Books;
 This annotation does the following things in the background:
 
 - Adds an action `print` to the annotated entity with the following parameters:
-  - `Queue`: Name of the print queue to use
-  - `Copies`: Number of copies to print
+  - `Queue`: Name of the print queue to use.
+  - `Copies`: Number of copies to print.
   - `File`: Only added if the entity has multiple `LargeBinary` attributes. Allows selecting which file should be printed. Ensure that the `LargeBinary` properties are annotated with `@Common.Label`.
 - This action is added to the UI and a handler is generated to process the print request.
 - An entity `PrintServiceQueues` is added to the service to provide available print queues in a value help.
@@ -52,7 +51,7 @@ You can also use the print service to print documents manually, i.e., without th
 Use cases for a manual approach could be:
 - You want to print documents that are not part of your CDS model, i.e., files generated at runtime
 - Your model does not meet the requirements for the automatic approach
-- You want to print another file type than PDF
+- You want to print a file type other than PDF
 
 For this, you can use the `cds.connect.to` API of CAP to connect to the print service and invoke the `print` action manually.
 
@@ -74,11 +73,11 @@ await printService.send("print", {
 const queues = await printService.get("/Queues");
 ```
 
-It is possible that for LargeBinaries retrieved from the database, the content is provided as a stream. In this case, the stream needs to be converted to base64 before passing it to the print service. For example, have a look at the sample application in `test/bookshop/`
+It is possible that for LargeBinaries retrieved from the database, the content is provided as a stream. In this case, the stream needs to be converted to base64 before passing it to the print service. For example, see the sample application in `test/bookshop/`
 
 ## Local Development
 
-When running the application locally, i.e., `cds watch`, the print service is mocked. This mock implementation prints the print job details to the console instead of sending them to the actual print service. It also provides a number of sample print queues for selection.
+When running the application locally, the print service is mocked. This mock implementation prints the print job details to the console instead of sending them to the actual print service. It also provides a number of sample print queues for selection.
 
 ## Hybrid Testing
 
@@ -103,11 +102,11 @@ For CI, the hybrid integration tests are automatically run against a SAP Print S
 
 ## Support, Feedback, Contributing
 
-This project is open to feature requests/suggestions, bug reports, etc. via [GitHub issues](https://github.com/cap-js/print/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
+This project is open to feature requests/suggestions, bug reports, etc. via [GitHub issues](https://github.com/cap-js/print/issues). Contributions and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
 
 ## Security / Disclosure
 
-If you find any bug that may be a security problem, please follow the instructions [in our security policy](https://github.com/cap-js/print/security/policy) on how to report it. Please do not create GitHub issues for security-related doubts or problems.
+If you find a bug that may be a security problem, please follow the instructions [in our security policy](https://github.com/cap-js/print/security/policy) on how to report it. Please do not create GitHub issues for security-related doubts or problems.
 
 ## Code of Conduct
 
