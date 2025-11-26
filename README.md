@@ -4,7 +4,7 @@
 
 ## About this project
 
-CDS plugin for SAP Print service (package `@cap-js/print`) is a CDS plugin that provides print service features through integration with the [SAP Print Service](https://api.sap.com/api/PRINTAPI/overview).
+The `@cap-js/print` package is a [CDS plugin](https://cap.cloud.sap/docs/node.js/cds-plugins#cds-plugin-packages) that provides print service features through integration with the [SAP Print Service](https://api.sap.com/api/PRINTAPI/overview).
 
 ## Table of Contents
 
