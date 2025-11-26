@@ -2,7 +2,9 @@
   "name": "@cap-js/print",
   "version": "0.1.0",
   "description": "CAP plugin for SAP Cloud Print Service.",
-  "repository": "@cap-js/print",
+  "repository": {
+    "url": "https://github.com/cap-js/print"
+  },
   "homepage": "https://cap.cloud.sap/",
   "main": "cds-plugin.js",
   "author": "SAP SE (https://www.sap.com)",
