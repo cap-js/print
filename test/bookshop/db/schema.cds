@@ -14,8 +14,8 @@ entity Books : managed, BooksWithOneFile {
 
 entity BooksWithOneFile {
   key ID   : Integer;
-  title    : localized String(111)  @mandatory;
-  descr    : localized String(1111);
+  title    : String(111)  @mandatory;
+  descr    : String(1111);
   author   : Association to Authors @mandatory;
   genre    : Association to Genres;
   stock    : Integer;
