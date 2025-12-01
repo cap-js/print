@@ -118,6 +118,31 @@ describe("Print entities tests", () => {
 
       expect(response.status).toBe(200);
     });
+
+    it("should provide a valid VH for print files for composite keys", async () => {
+      const response = await GET(
+        "/odata/v4/catalog/PrintServiceFiles?$select=entity,entityKey1,entityKey2,fileName,label,property&$count=true&$orderby=label&$filter=entity eq 'CatalogService.CompositeKeys' and entityKey1 eq '1' and entityKey2 eq '2' &$skip=0&$top=100",
+      );
+
+      expect(response.data).toBeDefined();
+      expect(response.data["@odata.count"]).toBe(2);
+
+      expect(response.data.value[0]).toMatchObject({
+        entityName: "CatalogService.CompositeKeys",
+        property: "file",
+        fileName: "Book_Composite_Summary.pdf",
+        label: "Summaryyy",
+      });
+
+      expect(response.data.value[1]).toMatchObject({
+        entityName: "CatalogService.CompositeKeys",
+        property: "file2",
+        fileName: "Book_Composite_Summary_2.pdf",
+        label: "Summaryyy2",
+      });
+
+      expect(response.status).toBe(200);
+    });
   });
 
   describe("Print queues retrieval", () => {

@@ -48,3 +48,21 @@ entity Genres : sap.common.CodeList {
       children : Composition of many Genres
                    on children.parent = $self;
 }
+
+entity CompositeKeys : managed {
+  key ID : Integer;
+  key ID2 : Integer;
+
+  @Common.Label: '{i18n>Summary}'
+  @Core.MediaType: 'application/pdf'
+  @Core.ContentDisposition: fileName
+  file : LargeBinary;
+  @Common.Label: '{i18n>Summary}'
+  fileName : String  @readonly;
+  @Common.Label: '{i18n>Summary2} '
+  @Core.MediaType: 'application/pdf'
+  @Core.ContentDisposition: fileName2
+  file2 : LargeBinary ;
+  @Common.Label: '{i18n>Summary2} '
+  fileName2 : String  @readonly;
+}

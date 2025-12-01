@@ -59,4 +59,17 @@ describe("Print action tests", () => {
     );
     expect(response.status).toBe(204);
   });
+
+  it("should send a print request via bound action automatically added with multiple files, draft enabled and multiple keys", async () => {
+    const response = await POST(
+      `/odata/v4/catalog/CompositeKeys(ID=1,ID2=2,IsActiveEntity=true)/CatalogService.print`,
+      {
+        copies: 1,
+        qnameID: "OFFICE_PRINTER_01",
+        fileElement: "file",
+      },
+    );
+
+    expect(response.status).toBe(204);
+  });
 });
