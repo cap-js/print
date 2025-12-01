@@ -44,4 +44,19 @@ describe("Print action tests", () => {
     );
     expect(response.status).toBe(204);
   });
+
+  it("should send a print request via bound action automatically added with multiple files and draft enabled", async () => {
+    const bookId = 201;
+
+    const response = await POST(
+      `/odata/v4/admin/Books(ID=${bookId},IsActiveEntity=true)/AdminService.print`,
+      {
+        copies: 1,
+        qnameID: "OFFICE_PRINTER_01",
+        fileElement: "file",
+      },
+      { auth: { username: "alice" } },
+    );
+    expect(response.status).toBe(204);
+  });
 });

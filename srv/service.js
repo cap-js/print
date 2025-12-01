@@ -31,7 +31,7 @@ class PrintService extends cds.Service {
 
       for (let i = 0; i < keyFields.length; i++) {
         const keyField = keyFields[i];
-        if(keyField === "IsActiveEntity") continue;
+        // if (keyField === "IsActiveEntity") continue; // select with IsActiveEntity is not supported
         const keyFilterIndex = req.query?.SELECT?.where?.findIndex(
           (item) =>
             typeof item === "object" &&
@@ -43,7 +43,7 @@ class PrintService extends cds.Service {
         keys[keyField] = keyValue;
 
         if (req.query?.SELECT?.where && req.query.SELECT.where.length === 3) {
-          delete req.query.SELECT.where;
+          req.query.SELECT.where = undefined;
         } else {
           req.query.SELECT.where.splice(keyFilterIndex, 4);
         }
