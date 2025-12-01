@@ -95,5 +95,17 @@ module.exports = async function () {
         }),
     ];
   });
+
+  insertPromises.push(
+    INSERT.into("CompositeKeys").entries({
+      ID: 1,
+      ID2: 2,
+      file: templatePDF,
+      fileName: `Book_Composite_Summary.pdf`,
+      file2: templatePDF,
+      fileName2: `Book_Composite_Summary_2.pdf`,
+    }),
+  );
+
   await Promise.all(insertPromises);
 };

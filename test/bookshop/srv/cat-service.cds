@@ -68,4 +68,8 @@ service CatalogService {
     quantity : Integer;
     buyer    : String
   };
+
+  @odata.draft.enabled
+  @PDF.Printable
+  entity CompositeKeys    as projection on my.CompositeKeys;
 }
