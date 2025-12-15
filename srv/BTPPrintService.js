@@ -112,17 +112,20 @@ module.exports = class BTPPrintService extends PrintService {
     } catch (e) {
       console.error("ACTION print: Error retrieving jwt", e.message);
       throw new Error(httpCodes.internal_server_error, "ACTION_PRINT_NO_ACCESS");
-      return;
     }
 
-    // const destination = await getDestination();
-
     // hier auf custom url and token
-    const response = await executeHttpRequestWithOrigin(
+    const response = await executeHttpRequest(
       {
         url: `${srvUrl}/qm/api/v1/rest/queues`,
       },
-      { method: "GET", headers: { Authorization: `Bearer ${jwt}` } },
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${authorization}`,
+          // ...(isConsumerSpecific && { "X-Zid": tenantId }),
+        },
+      },
     );
 
     const queues = response.data.map((q) => ({ ID: q.qname }));
