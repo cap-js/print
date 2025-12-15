@@ -176,7 +176,7 @@ module.exports = class BTPPrintService extends PrintService {
           },
           body: JSON.stringify(doc.content),
         });
-        const responseData = await response.json();
+        const responseData = await response.text();
         doc.objectKey = responseData;
       } catch (e) {
         LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
