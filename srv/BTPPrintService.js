@@ -137,7 +137,7 @@ module.exports = class BTPPrintService extends PrintService {
       `Print request received for queue: ${qname}, copies: ${numberOfCopies}, documents: ${docsToPrint?.length || 0}`,
     );
 
-    await _print(printRequest);
+    await this._print(printRequest);
 
     LOG.info(`Print request successfully processed.`);
 
@@ -147,123 +147,104 @@ module.exports = class BTPPrintService extends PrintService {
       taskId: `console-task-${Date.now()}`,
     };
   }
-};
+  /**
+   * Handles the print request.
+   * @param {Object} _ - Unused parameter.
+   * @param {Object} req - The request object.
+   */
+  async _print(printRequest) {
+    const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
 
-const getDestination = async () => {
-  const destination = await getDestinationFromServiceBinding({
-    destinationName: "print-service",
-    useCache: false,
-    serviceBindingTransformFn: async function (service, options) {
-      return transformServiceBindingToClientCredentialsDestination(
-        Object.assign(service, {
-          credentials: service.credentials.uaa,
-          url: service.credentials.service_url,
-        }),
-        options,
-      );
-    },
-  });
+    cds.log("=== REQUEST BASIC INFO ===");
+    const srvUrl = this._getServiceCredentials("print")?.service_url;
 
-  return destination;
-};
-
-/**
- * Handles the print request.
- * @param {Object} _ - Unused parameter.
- * @param {Object} req - The request object.
- */
-const _print = async function (printRequest) {
-  const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
-
-  cds.log("=== REQUEST BASIC INFO ===");
-  const srvUrl = this._getServiceCredentials("print")?.service_url;
-
-  let jwt = "";
-  try {
-    jwt = await this.getServiceToken("print");
-  } catch (e) {
-    LOG.error("ACTION print: Error retrieving jwt", e.message);
-    throw new Error("No access to print service.");
-  }
-
-  // 1. Upload documents to be printed
-  const uploadPromises = docsToPrint.map(async (doc) => {
-    if (!doc.content) {
-      LOG.error("No content provided for printing");
-      throw new Error("No content provided for printing");
-    }
+    let jwt = "";
     try {
-      const response = await executeHttpRequest(
+      jwt = await this.getServiceToken("print");
+    } catch (e) {
+      LOG.error("ACTION print: Error retrieving jwt", e.message);
+      throw new Error("No access to print service.");
+    }
+
+    // 1. Upload documents to be printed
+    const uploadPromises = docsToPrint.map(async (doc) => {
+      if (!doc.content) {
+        LOG.error("No content provided for printing");
+        throw new Error("No content provided for printing");
+      }
+      try {
+        const response = await executeHttpRequest(
+          {
+            url: `${srvUrl}/dm/api/v1/rest/print-documents`,
+          },
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${jwt}`,
+            },
+            data: doc.content,
+          },
+        );
+        doc.objectKey = response.data;
+      } catch (e) {
+        LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
+        throw new Error(`Printing failed during upload of document ${doc.fileName}.`);
+      }
+    });
+
+    await Promise.all(uploadPromises);
+
+    LOG.info("All documents uploaded successfully");
+
+    let printTask = {
+      numberOfCopies: numberOfCopies,
+      username: cds.context?.user?.id,
+      // username: "preceiver",
+      qname: selectedQueue,
+      printContents: [],
+    };
+    docsToPrint.forEach(async (doc) => {
+      printTask.printContents.push({
+        objectKey: doc.objectKey,
+        documentName: doc.fileName,
+      });
+    });
+
+    // 2. Print Task
+    const itemId = printTask.printContents[0].objectKey;
+    try {
+      const data = {
+        ...printTask,
+        metadata: {
+          business_metadata: {
+            business_user: printTask.username,
+            object_node_type: "object_node_1",
+          },
+          version: 1.2,
+        },
+      };
+
+      await executeHttpRequest(
         {
-          url: `${srvUrl}/dm/api/v1/rest/print-documents`,
+          url: `${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`,
         },
         {
-          method: "POST",
+          method: "put",
           headers: {
             Authorization: `Bearer ${jwt}`,
+            requestConfig: { "If-None-Match": "*" },
           },
-          data: doc.content,
+          data,
         },
       );
-      doc.objectKey = response.data;
     } catch (e) {
-      LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
-      throw new Error(`Printing failed during upload of document ${doc.fileName}.`);
+      LOG.error("Error in sending to print queue: ", e.message);
+      throw new Error("Printing failed during creation of print task.");
     }
-  });
+    LOG.info(`Document sent to print queue ${selectedQueue}`);
 
-  await Promise.all(uploadPromises);
-
-  LOG.info("All documents uploaded successfully");
-
-  let printTask = {
-    numberOfCopies: numberOfCopies,
-    username: cds.context?.user?.id,
-    // username: "preceiver",
-    qname: selectedQueue,
-    printContents: [],
-  };
-  docsToPrint.forEach(async (doc) => {
-    printTask.printContents.push({
-      objectKey: doc.objectKey,
-      documentName: doc.fileName,
-    });
-  });
-
-  // 2. Print Task
-  const itemId = printTask.printContents[0].objectKey;
-  try {
-    const data = {
-      ...printTask,
-      metadata: {
-        business_metadata: {
-          business_user: printTask.username,
-          object_node_type: "object_node_1",
-        },
-        version: 1.2,
-      },
+    return {
+      taskId: itemId,
     };
-
-    await executeHttpRequest(
-      {
-        url: `${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`,
-      },
-      {
-        method: "put",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          requestConfig: { "If-None-Match": "*" },
-        },
-        data,
-      },
-    );
-  } catch (e) {
-    LOG.error("Error in sending to print queue: ", e.message);
-    throw new Error("Printing failed during creation of print task.");
   }
-  LOG.info(`Document sent to print queue ${selectedQueue}`);
-
-  return {
-    taskId: itemId,
-  };
 };
