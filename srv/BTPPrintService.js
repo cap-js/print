@@ -115,7 +115,8 @@ module.exports = class BTPPrintService extends PrintService {
       },
     });
 
-    const queues = response.data.map((q) => ({ ID: q.qname }));
+    const responseData = await response.json();
+    const queues = responseData.data.map((q) => ({ ID: q.qname }));
 
     return queues;
   }
