@@ -22,7 +22,7 @@ module.exports = class BTPPrintService extends PrintService {
       jwt = await this.getToken(cds.context?.tenant);
     } catch (e) {
       console.error("ACTION print: Error retrieving jwt", e.message);
-      throw new Error("ACTION_PRINT_NO_ACCESS");
+      req.error(500, "No access to print service.");
     }
 
     const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
