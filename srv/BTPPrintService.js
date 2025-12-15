@@ -225,6 +225,21 @@ module.exports = class BTPPrintService extends PrintService {
         },
         body: JSON.stringify(data),
       });
+      if (!r.ok) {
+        const body = await r.text();
+        console.error("Print task creation failed. Response body:", body);
+        console.error("Fetch response debug info:", {
+          status: r.status,
+          statusText: r.statusText,
+          ok: r.ok,
+          url: r.url,
+          redirected: r.redirected,
+          type: r.type,
+          headers: Object.fromEntries(r.headers.entries()),
+          // body is a stream; log body content separately after reading with r.text() or r.json()
+        });
+        throw new Error(`Print task creation failed with status ${r.status}`);
+      }
       console.log("Print task response status:", r.status);
     } catch (e) {
       LOG.error("Error in sending to print queue: ", e.message);
