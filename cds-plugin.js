@@ -90,7 +90,7 @@ cds.once("served", async () => {
                 ],
               });
 
-              return req.info({
+              return req.notify({
                 status: 200,
                 message: "PRINT_JOB_SENT",
                 args: [object[fileNameAttribute], queueID],

@@ -53,7 +53,10 @@
           "kind": "print-to-service"
         },
         "vcap": {
-          "tag": "print"
+          "label": "print"
+        },
+        "subscriptionDependency": {
+          "uaa": "xsappname"
         },
         "outbox": true
       },
