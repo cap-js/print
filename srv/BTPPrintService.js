@@ -122,7 +122,7 @@ module.exports = class BTPPrintService extends PrintService {
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${authorization}`,
+          Authorization: `Bearer ${jwt}`,
           // ...(isConsumerSpecific && { "X-Zid": tenantId }),
         },
       },
