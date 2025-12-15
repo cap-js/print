@@ -5,12 +5,11 @@ const { getServiceToken, getServiceCredentials } = require("../lib/btp-utils");
 const { TokenCache } = require("../lib/TokenCache");
 
 module.exports = class BTPPrintService extends PrintService {
-  tokenCache;
+  tokenCache = new TokenCache();
 
   async init() {
     LOG.info("Productive Print service initialized.");
     return super.init();
-    tokenCache = new TokenCache();
   }
 
   /**
@@ -23,7 +22,7 @@ module.exports = class BTPPrintService extends PrintService {
       jwt = await this.getToken(cds.context?.tenant);
     } catch (e) {
       console.error("ACTION print: Error retrieving jwt", e.message);
-      throw new Error(httpCodes.internal_server_error, "ACTION_PRINT_NO_ACCESS");
+      throw new Error("ACTION_PRINT_NO_ACCESS");
     }
 
     const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
@@ -174,7 +173,7 @@ module.exports = class BTPPrintService extends PrintService {
   }
 
   async getToken(tenantId) {
-    const tokenFromCache = this.tokenCache.get?.(tenantId);
+    const tokenFromCache = this.tokenCache.get(tenantId);
     return (
       tokenFromCache ??
       (await (async () => {
