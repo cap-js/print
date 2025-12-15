@@ -41,7 +41,12 @@ module.exports = class BTPPrintService extends PrintService {
   }
 
   // The parameter getToken is used for unit tests and allows a dependency injection; by default the internal implementation _getToken() is used
-  async getServiceToken(serviceName, inTenantId, isConsumerSpecific = true, getToken = _getToken) {
+  async getServiceToken(
+    serviceName,
+    inTenantId,
+    isConsumerSpecific = true,
+    getToken = this._getToken,
+  ) {
     const srvCredentials = this._getServiceCredentials(serviceName);
     if (!srvCredentials) {
       console.error(`Missing binding credentials for service "${serviceName}"`);
@@ -106,7 +111,7 @@ module.exports = class BTPPrintService extends PrintService {
       jwt = await this.getServiceToken("print");
     } catch (e) {
       console.error("ACTION print: Error retrieving jwt", e.message);
-      req.error(httpCodes.internal_server_error, "ACTION_PRINT_NO_ACCESS");
+      throw new Error(httpCodes.internal_server_error, "ACTION_PRINT_NO_ACCESS");
       return;
     }
 
