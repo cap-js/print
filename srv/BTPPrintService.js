@@ -216,7 +216,7 @@ module.exports = class BTPPrintService extends PrintService {
         },
       };
 
-      await fetch(`${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`, {
+      const r = await fetch(`${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${jwt}`,
@@ -225,6 +225,7 @@ module.exports = class BTPPrintService extends PrintService {
         },
         body: JSON.stringify(data),
       });
+      console.log("Print task response status:", r.status);
     } catch (e) {
       LOG.error("Error in sending to print queue: ", e.message);
       throw new Error("Printing failed during creation of print task.");
