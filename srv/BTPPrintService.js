@@ -116,7 +116,7 @@ module.exports = class BTPPrintService extends PrintService {
     });
 
     const responseData = await response.json();
-    const queues = responseData.data.map((q) => ({ ID: q.qname }));
+    const queues = responseData.map((q) => ({ ID: q.qname }));
 
     return queues;
   }
@@ -177,7 +177,7 @@ module.exports = class BTPPrintService extends PrintService {
           body: JSON.stringify(doc.content),
         });
         const responseData = await response.json();
-        doc.objectKey = responseData.data;
+        doc.objectKey = responseData;
       } catch (e) {
         LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
         throw new Error(`Printing failed during upload of document ${doc.fileName}.`);
