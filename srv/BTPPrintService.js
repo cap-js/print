@@ -108,18 +108,12 @@ module.exports = class BTPPrintService extends PrintService {
       throw new Error(httpCodes.internal_server_error, "ACTION_PRINT_NO_ACCESS");
     }
 
-    // hier auf custom url and token
-    const response = await executeHttpRequest(
-      {
-        url: `${srvUrl}/qm/api/v1/rest/queues`,
+    const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
       },
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      },
-    );
+    });
 
     const queues = response.data.map((q) => ({ ID: q.qname }));
 
@@ -173,19 +167,16 @@ module.exports = class BTPPrintService extends PrintService {
         throw new Error("No content provided for printing");
       }
       try {
-        const response = await executeHttpRequest(
-          {
-            url: `${srvUrl}/dm/api/v1/rest/print-documents`,
+        const response = await fetch(`${srvUrl}/dm/api/v1/rest/print-documents`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+            "Content-Type": "application/json",
           },
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${jwt}`,
-            },
-            data: doc.content,
-          },
-        );
-        doc.objectKey = response.data;
+          body: JSON.stringify(doc.content),
+        });
+        const responseData = await response.json();
+        doc.objectKey = responseData.data;
       } catch (e) {
         LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
         throw new Error(`Printing failed during upload of document ${doc.fileName}.`);
@@ -224,19 +215,15 @@ module.exports = class BTPPrintService extends PrintService {
         },
       };
 
-      await executeHttpRequest(
-        {
-          url: `${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`,
+      await fetch(`${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          "Content-Type": "application/json",
+          "If-None-Match": "*",
         },
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-            requestConfig: { "If-None-Match": "*" },
-          },
-          data,
-        },
-      );
+        body: JSON.stringify(data),
+      });
     } catch (e) {
       LOG.error("Error in sending to print queue: ", e.message);
       throw new Error("Printing failed during creation of print task.");
