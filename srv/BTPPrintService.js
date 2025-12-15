@@ -45,7 +45,7 @@ module.exports = class BTPPrintService extends PrintService {
     serviceName,
     inTenantId,
     isConsumerSpecific = true,
-    getToken = this._getToken,
+    getToken = this._getToken, //changed
   ) {
     const srvCredentials = this._getServiceCredentials(serviceName);
     if (!srvCredentials) {
