@@ -229,10 +229,10 @@ module.exports = class BTPPrintService extends PrintService {
           url: `${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`,
         },
         {
-          method: "put",
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${jwt}`,
-            requestConfig: { "If-None-Match": "*" },
+            // requestConfig: { "If-None-Match": "*" },
           },
           data,
         },
