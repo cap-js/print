@@ -216,12 +216,14 @@ module.exports = class BTPPrintService extends PrintService {
         },
       };
 
+      const tenantId = cds.context?.tenant;
       const r = await fetch(`${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${jwt}`,
           "Content-Type": "application/json",
           "If-None-Match": "*",
+          "X-Zid": tenantId,
         },
         body: JSON.stringify(data),
       });
