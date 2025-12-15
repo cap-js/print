@@ -232,7 +232,7 @@ module.exports = class BTPPrintService extends PrintService {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${jwt}`,
-            // requestConfig: { "If-None-Match": "*" },
+            requestConfig: { "If-None-Match": "*" },
           },
           data,
         },
