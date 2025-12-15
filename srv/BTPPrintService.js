@@ -40,13 +40,7 @@ module.exports = class BTPPrintService extends PrintService {
     }
   }
 
-  // The parameter getToken is used for unit tests and allows a dependency injection; by default the internal implementation _getToken() is used
-  async getServiceToken(
-    serviceName,
-    inTenantId,
-    isConsumerSpecific = true,
-    getToken = this._getToken, //changed
-  ) {
+  async getServiceToken(serviceName, inTenantId, isConsumerSpecific = true) {
     const srvCredentials = this._getServiceCredentials(serviceName);
     if (!srvCredentials) {
       console.error(`Missing binding credentials for service "${serviceName}"`);
@@ -79,7 +73,7 @@ module.exports = class BTPPrintService extends PrintService {
       }
     }
 
-    const responseGetToken = await getToken(
+    const responseGetToken = await this._getToken(
       authUrl,
       clientId,
       clientSecret,
@@ -123,7 +117,6 @@ module.exports = class BTPPrintService extends PrintService {
         method: "GET",
         headers: {
           Authorization: `Bearer ${jwt}`,
-          // ...(isConsumerSpecific && { "X-Zid": tenantId }),
         },
       },
     );
@@ -183,7 +176,15 @@ const _print = async function (printRequest) {
   const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
 
   cds.log("=== REQUEST BASIC INFO ===");
-  const destination = await getDestination();
+  const srvUrl = this._getServiceCredentials("print")?.service_url;
+
+  let jwt = "";
+  try {
+    jwt = await this.getServiceToken("print");
+  } catch (e) {
+    LOG.error("ACTION print: Error retrieving jwt", e.message);
+    throw new Error("No access to print service.");
+  }
 
   // 1. Upload documents to be printed
   const uploadPromises = docsToPrint.map(async (doc) => {
@@ -192,11 +193,18 @@ const _print = async function (printRequest) {
       throw new Error("No content provided for printing");
     }
     try {
-      const response = await executeHttpRequest(destination, {
-        url: "/dm/api/v1/rest/print-documents",
-        method: "POST",
-        data: doc.content,
-      });
+      const response = await executeHttpRequest(
+        {
+          url: `${srvUrl}/dm/api/v1/rest/print-documents`,
+        },
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+          data: doc.content,
+        },
+      );
       doc.objectKey = response.data;
     } catch (e) {
       LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
@@ -236,12 +244,19 @@ const _print = async function (printRequest) {
       },
     };
 
-    await executeHttpRequest(destination, {
-      url: `/qm/api/v1/rest/print-tasks/${itemId}`,
-      method: "put",
-      data,
-      headers: { requestConfig: { "If-None-Match": "*" } },
-    });
+    await executeHttpRequest(
+      {
+        url: `${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`,
+      },
+      {
+        method: "put",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          requestConfig: { "If-None-Match": "*" },
+        },
+        data,
+      },
+    );
   } catch (e) {
     LOG.error("Error in sending to print queue: ", e.message);
     throw new Error("Printing failed during creation of print task.");
