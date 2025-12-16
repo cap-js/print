@@ -2,7 +2,7 @@ const PrintService = require("./service");
 const cds = require("@sap/cds");
 const LOG = cds.log("print");
 const { getServiceToken, getServiceCredentials } = require("../lib/btp-utils");
-const { TokenCache } = require("../lib/token-cache");
+const TokenCache = require("../lib/token-cache");
 
 module.exports = class BTPPrintService extends PrintService {
   tokenCache = new TokenCache();
@@ -16,27 +16,25 @@ module.exports = class BTPPrintService extends PrintService {
    * Get available print queues
    */
   async getQueues(req) {
-    const srvUrl = getServiceCredentials("print")?.service_url;
-    let jwt = "";
     try {
-      jwt = await this.getToken(cds.context?.tenant);
+      const srvUrl = getServiceCredentials("print")?.service_url;
+      const jwt = await this.getToken(cds.context?.tenant);
+
+      const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      });
+
+      const responseData = await response.json();
+      const queues = responseData.map((q) => ({ ID: q.qname }));
+
+      return queues;
     } catch (e) {
-      console.error("ACTION print: Error retrieving jwt", e.message);
-      req.error(500, "No access to print service.");
-      return;
+      LOG.error("Error while getting queues: ", e.message);
+      return req.error(500, "An error occured while fetching print queues.");
     }
-
-    const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-
-    const responseData = await response.json();
-    const queues = responseData.map((q) => ({ ID: q.qname }));
-
-    return queues;
   }
 
   /**
@@ -161,7 +159,7 @@ module.exports = class BTPPrintService extends PrintService {
         });
         throw new Error(`Print task creation failed with status ${r.status}`);
       }
-      console.log("Print task response status:", r.status);
+      LOG.debug("Print task response status:", r.status);
     } catch (e) {
       LOG.error("Error in sending to print queue: ", e.message);
       throw new Error("Printing failed during creation of print task.");
