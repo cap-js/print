@@ -2,7 +2,7 @@ const PrintService = require("./service");
 const cds = require("@sap/cds");
 const LOG = cds.log("print");
 const { getServiceToken, getServiceCredentials } = require("../lib/btp-utils");
-const { TokenCache } = require("../lib/TokenCache");
+const { TokenCache } = require("../lib/token-cache");
 
 module.exports = class BTPPrintService extends PrintService {
   tokenCache = new TokenCache();
@@ -15,7 +15,7 @@ module.exports = class BTPPrintService extends PrintService {
   /**
    * Get available print queues
    */
-  async getQueues() {
+  async getQueues(req) {
     const srvUrl = getServiceCredentials("print")?.service_url;
     let jwt = "";
     try {
@@ -23,6 +23,7 @@ module.exports = class BTPPrintService extends PrintService {
     } catch (e) {
       console.error("ACTION print: Error retrieving jwt", e.message);
       req.error(500, "No access to print service.");
+      return;
     }
 
     const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
@@ -173,12 +174,15 @@ module.exports = class BTPPrintService extends PrintService {
   }
 
   async getToken(tenantId) {
-    const tokenFromCache = this.tokenCache.get(tenantId);
+    const tokenFromCache = this.tokenCache.get(tenantId ?? "single-tenant");
     return (
       tokenFromCache ??
       (await (async () => {
-        const { jwt: jwtFromService, expires_in } = await getServiceToken("print");
-        this.tokenCache.set?.(tenantId, jwtFromService, expires_in);
+        const { jwt: jwtFromService, expires_in } = await getServiceToken(
+          "print",
+          cds.context?.tenant !== undefined,
+        );
+        this.tokenCache.set?.(tenantId ?? "single-tenant", jwtFromService, expires_in);
         return jwtFromService;
       })())
     );
