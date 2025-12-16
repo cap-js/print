@@ -177,7 +177,7 @@ module.exports = class BTPPrintService extends PrintService {
     return (
       tokenFromCache ??
       (await (async () => {
-        const { jwtFromService, expires_in } = await getServiceToken("print");
+        const { jwt: jwtFromService, expires_in } = await getServiceToken("print");
         this.tokenCache.set?.(tenantId, jwtFromService, expires_in);
         return jwtFromService;
       })())
