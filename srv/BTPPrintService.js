@@ -73,8 +73,7 @@ module.exports = class BTPPrintService extends PrintService {
     try {
       jwt = await this.getToken(tenantId);
     } catch (e) {
-      LOG.error("ACTION print: Error retrieving jwt", e.message);
-      throw new Error("No access to print service.");
+      throw new Error("ACTION print: Error retrieving jwt", e.message);
     }
 
     // 1. Upload documents to be printed
