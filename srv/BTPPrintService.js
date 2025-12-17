@@ -141,8 +141,8 @@ module.exports = class BTPPrintService extends PrintService {
 
       if (!r.ok) {
         const body = await r.text();
-        console.error("Print task creation failed. Response body:", body);
-        console.error("Fetch response debug info:", {
+        LOG.error("Print task creation failed. Response body:", body);
+        LOG.debug("Fetch response debug info:", {
           status: r.status,
           statusText: r.statusText,
           ok: r.ok,
@@ -150,7 +150,6 @@ module.exports = class BTPPrintService extends PrintService {
           redirected: r.redirected,
           type: r.type,
           headers: Object.fromEntries(r.headers.entries()),
-          // body is a stream; log body content separately after reading with r.text() or r.json()
         });
         throw new Error(`Print task creation failed with status ${r.status}`);
       }
