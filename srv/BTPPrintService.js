@@ -166,18 +166,18 @@ module.exports = class BTPPrintService extends PrintService {
   }
 
   async getToken(tenantId) {
-    // const tokenFromCache = this.tokenCache.get(tenantId ?? "single-tenant");
-    // return (
-    //   tokenFromCache ??
-    //   (await (async () => {
-    const { jwt: jwtFromService, expires_in } = await getServiceToken(
-      PRINT_SERVICE_NAME,
-      cds.context?.tenant !== undefined,
+    const tokenFromCache = this.tokenCache.get(tenantId ?? "single-tenant");
+    return (
+      tokenFromCache ??
+      (await (async () => {
+        const { jwt: jwtFromService, expires_in } = await getServiceToken(
+          PRINT_SERVICE_NAME,
+          cds.context?.tenant !== undefined,
+        );
+        this.tokenCache.set?.(tenantId ?? "single-tenant", jwtFromService, expires_in);
+        return jwtFromService;
+      })())
     );
-    //   this.tokenCache.set?.(tenantId ?? "single-tenant", jwtFromService, expires_in);
-    //   return jwtFromService;
-    // })())
-    // );
     return jwtFromService;
   }
 };
