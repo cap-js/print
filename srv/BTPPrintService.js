@@ -178,6 +178,5 @@ module.exports = class BTPPrintService extends PrintService {
         return jwtFromService;
       })())
     );
-    return jwtFromService;
   }
 };
