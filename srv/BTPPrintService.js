@@ -4,7 +4,7 @@ const LOG = cds.log("print");
 const { getServiceToken, getServiceCredentials } = require("../lib/btp-utils");
 const TokenCache = require("../lib/token-cache");
 
-const PRINT_SERVICE_NAME = "PrintService";
+const PRINT_SERVICE_NAME = "print";
 
 module.exports = class BTPPrintService extends PrintService {
   tokenCache = new TokenCache();

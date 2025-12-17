@@ -38,7 +38,7 @@
   ],
   "cds": {
     "requires": {
-      "PrintService": {
+      "print": {
         "[development]": {
           "kind": "print-to-console"
         },
