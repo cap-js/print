@@ -66,7 +66,7 @@ module.exports = class BTPPrintService extends PrintService {
     const tenantId = cds.context?.tenant;
     const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
 
-    cds.log("=== REQUEST BASIC INFO ===");
+    LOG.debug("=== REQUEST BASIC INFO ===");
     const srvUrl = getServiceCredentials("print")?.service_url;
 
     let jwt = "";
