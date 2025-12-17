@@ -60,7 +60,6 @@ module.exports = class BTPPrintService extends PrintService {
   }
   /**
    * Handles the print request.
-   * @param {Object} _ - Unused parameter.
    * @param {Object} req - The request object.
    */
   async _print(printRequest) {
