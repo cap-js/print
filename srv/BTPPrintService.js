@@ -32,8 +32,7 @@ module.exports = class BTPPrintService extends PrintService {
 
       return queues;
     } catch (e) {
-      LOG.error("Error while getting queues: ", e.message);
-      return req.error(500, "An error occured while fetching print queues.");
+      return req.error(500, "An error occured while fetching print queues: " + e.message);
     }
   }
 
@@ -79,7 +78,6 @@ module.exports = class BTPPrintService extends PrintService {
     // 1. Upload documents to be printed
     const uploadPromises = docsToPrint.map(async (doc) => {
       if (!doc.content) {
-        LOG.error("No content provided for printing");
         throw new Error("No content provided for printing");
       }
       try {
@@ -94,8 +92,7 @@ module.exports = class BTPPrintService extends PrintService {
         const responseData = await response.text();
         doc.objectKey = responseData;
       } catch (e) {
-        LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
-        throw new Error(`Printing failed during upload of document ${doc.fileName}.`);
+        throw new Error(`Printing failed during upload of document ${doc.fileName}: `, e.message);
       }
     });
 
@@ -159,8 +156,7 @@ module.exports = class BTPPrintService extends PrintService {
       }
       LOG.debug("Print task response status:", r.status);
     } catch (e) {
-      LOG.error("Error in sending to print queue: ", e.message);
-      throw new Error("Printing failed during creation of print task.");
+      throw new Error("Printing failed during creation of print task: ", e.message);
     }
     LOG.info(`Document sent to print queue ${selectedQueue}`);
 
