@@ -65,14 +65,13 @@ module.exports = class BTPPrintService extends PrintService {
     const tenantId = cds.context?.tenant;
     const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
 
-    LOG.debug("=== REQUEST BASIC INFO ===");
     const srvUrl = getServiceCredentials("print")?.service_url;
 
     let jwt = "";
     try {
       jwt = await this.getToken(tenantId);
     } catch (e) {
-      throw new Error("ACTION print: Error retrieving jwt", e.message);
+      throw new Error("Error retrieving jwt", e.message);
     }
 
     // 1. Upload documents to be printed
