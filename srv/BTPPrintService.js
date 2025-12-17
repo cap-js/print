@@ -4,6 +4,8 @@ const LOG = cds.log("print");
 const { getServiceToken, getServiceCredentials } = require("../lib/btp-utils");
 const TokenCache = require("../lib/token-cache");
 
+const PRINT_SERVICE_NAME = "PrintService";
+
 module.exports = class BTPPrintService extends PrintService {
   tokenCache = new TokenCache();
 
@@ -17,7 +19,7 @@ module.exports = class BTPPrintService extends PrintService {
    */
   async getQueues(req) {
     try {
-      const srvUrl = getServiceCredentials("print")?.service_url;
+      const srvUrl = getServiceCredentials(PRINT_SERVICE_NAME)?.service_url;
       const jwt = await this.getToken(cds.context?.tenant);
 
       const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
@@ -65,7 +67,7 @@ module.exports = class BTPPrintService extends PrintService {
     const tenantId = cds.context?.tenant;
     const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
 
-    const srvUrl = getServiceCredentials("print")?.service_url;
+    const srvUrl = getServiceCredentials(PRINT_SERVICE_NAME)?.service_url;
 
     let jwt = "";
     try {
@@ -164,17 +166,18 @@ module.exports = class BTPPrintService extends PrintService {
   }
 
   async getToken(tenantId) {
-    const tokenFromCache = this.tokenCache.get(tenantId ?? "single-tenant");
-    return (
-      tokenFromCache ??
-      (await (async () => {
-        const { jwt: jwtFromService, expires_in } = await getServiceToken(
-          "print",
-          cds.context?.tenant !== undefined,
-        );
-        this.tokenCache.set?.(tenantId ?? "single-tenant", jwtFromService, expires_in);
-        return jwtFromService;
-      })())
+    // const tokenFromCache = this.tokenCache.get(tenantId ?? "single-tenant");
+    // return (
+    //   tokenFromCache ??
+    //   (await (async () => {
+    const { jwt: jwtFromService, expires_in } = await getServiceToken(
+      PRINT_SERVICE_NAME,
+      cds.context?.tenant !== undefined,
     );
+    //   this.tokenCache.set?.(tenantId ?? "single-tenant", jwtFromService, expires_in);
+    //   return jwtFromService;
+    // })())
+    // );
+    return jwtFromService;
   }
 };
