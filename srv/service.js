@@ -80,6 +80,8 @@ class PrintService extends cds.Service {
     this.on("READ", this.entities.Queues, async (req) => {
       let result = await this.getQueues(req);
 
+      if (req.errors) return;
+
       return this.applyOdataRequestOptions(result, req);
     });
 
