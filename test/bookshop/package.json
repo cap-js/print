@@ -18,17 +18,5 @@
     "app/browse",
     "app/admin-books",
     "app/browse-one-file"
-  ],
-  "cds": {
-    "requires": {
-      "db": {
-        "[hybrid]": {
-          "kind": "sqlite",
-          "credentials": {
-            "url": ":memory:"
-          }
-        }
-      }
-    }
-  }
+  ]
 }
