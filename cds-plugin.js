@@ -96,8 +96,13 @@ cds.once("served", async () => {
                 args: [object[fileNameAttribute], queueID],
               });
             } catch (error) {
-              LOG.error("Print error:", error);
-              return req.reject({ status: 500, message: "PRINT_UNKNOWN_ERROR" });
+              LOG.error(error);
+              // Only return client errors to not show technical errors to the user
+              if (error.code >= 400 && error.code < 500) {
+                req.reject(error.code, error.message);
+              } else {
+                req.reject(500, "PRINT_UNKNOWN_ERROR");
+              }
             }
           });
         }

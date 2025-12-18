@@ -36,10 +36,10 @@ module.exports = class LocalPrintService extends PrintService {
    * Print method that outputs to console instead of real printer
    * This is called when printer.print() is invoked from other services
    */
-  async print(printRequest) {
-    const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
+  async print(req) {
+    const { qname: selectedQueue, numberOfCopies, docsToPrint } = req.data;
 
-    LOG.info("Received print request:", JSON.stringify(printRequest));
+    LOG.info("Received print request:", JSON.stringify(req.data));
 
     // Get available queues and validate the selected queue
 

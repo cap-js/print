@@ -10,48 +10,42 @@ module.exports = class BTPPrintService extends PrintService {
   tokenCache = new TokenCache();
 
   async init() {
-    LOG.info("Productive Print service initialized.");
     return super.init();
   }
 
-  /**
-   * Get available print queues
-   */
   async getQueues(req) {
-    try {
-      const srvUrl = getServiceCredentials(PRINT_SERVICE_NAME)?.service_url;
-      const jwt = await this.getToken(cds.context?.tenant);
+    const srvUrl = getServiceCredentials(PRINT_SERVICE_NAME)?.service_url;
+    const jwt = await this.getToken(cds.context?.tenant);
 
-      const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
+    const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
 
-      const responseData = await response.json();
-      const queues = responseData.map((q) => ({ ID: q.qname }));
-
-      return queues;
-    } catch (e) {
-      return req.error(500, "An error occured while fetching print queues: " + e.message);
+    if (!response.ok) {
+      const body = await response.text();
+      LOG.error("Error during Queue retriecal. Response body:", body);
+      req.reject(500, `Unexpected error during Queue retrieval ${response.status}`);
     }
+
+    const responseData = await response.json();
+    const queues = responseData.map((q) => ({ ID: q.qname }));
+
+    return queues;
   }
 
-  /**
-   * Print method that prints to real printer via REST API
-   * This is called when printer.print() is invoked from other services
-   */
-  async print(printRequest) {
-    const { qname, numberOfCopies, docsToPrint } = printRequest;
+  async print(req) {
+    const { qname, numberOfCopies, docsToPrint } = req.data;
 
-    LOG.info(
+    LOG.debug(
       `Print request received for queue: ${qname}, copies: ${numberOfCopies}, documents: ${docsToPrint?.length || 0}`,
     );
 
-    await this._print(printRequest);
+    await this._print(req);
 
-    LOG.info(`Print request successfully processed.`);
+    LOG.debug(`Print request successfully processed.`);
 
     return {
       status: "success",
@@ -59,13 +53,10 @@ module.exports = class BTPPrintService extends PrintService {
       taskId: `console-task-${Date.now()}`,
     };
   }
-  /**
-   * Handles the print request.
-   * @param {Object} req - The request object.
-   */
-  async _print(printRequest) {
+
+  async _print(req) {
     const tenantId = cds.context?.tenant;
-    const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
+    const { qname: selectedQueue, numberOfCopies, docsToPrint } = req.data;
 
     const srvUrl = getServiceCredentials(PRINT_SERVICE_NAME)?.service_url;
 
@@ -73,27 +64,33 @@ module.exports = class BTPPrintService extends PrintService {
     try {
       jwt = await this.getToken(tenantId);
     } catch (e) {
-      throw new Error("Error retrieving jwt", e.message);
+      req.reject(500, "Error during token fetching", e.message);
     }
 
     // 1. Upload documents to be printed
     const uploadPromises = docsToPrint.map(async (doc) => {
       if (!doc.content) {
-        throw new Error("No content provided for printing");
+        req.reject(400, "No content provided for printing");
       }
-      try {
-        const response = await fetch(`${srvUrl}/dm/api/v1/rest/print-documents`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(doc.content),
-        });
-        const responseData = await response.text();
-        doc.objectKey = responseData;
-      } catch (e) {
-        throw new Error(`Printing failed during upload of document ${doc.fileName}: `, e.message);
+
+      const response = await fetch(`${srvUrl}/dm/api/v1/rest/print-documents`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(doc.content),
+      });
+      const responseData = await response.text();
+      doc.objectKey = responseData;
+
+      if (!response.ok) {
+        const body = await response.text();
+        LOG.error(`Printing failed during upload of document ${doc.fileName}: `, body);
+        req.reject(
+          500,
+          `Printing failed during upload of document ${doc.fileName} with status ${response.status}`,
+        );
       }
     });
 
@@ -116,48 +113,35 @@ module.exports = class BTPPrintService extends PrintService {
 
     // 2. Print Task
     const itemId = printTask.printContents[0].objectKey;
-    try {
-      const data = {
-        ...printTask,
-        metadata: {
-          business_metadata: {
-            business_user: printTask.username,
-            object_node_type: "object_node_1",
-          },
-          version: 1.2,
+    const data = {
+      ...printTask,
+      metadata: {
+        business_metadata: {
+          business_user: printTask.username,
+          object_node_type: "object_node_1",
         },
-      };
+        version: 1.2,
+      },
+    };
 
-      const r = await fetch(`${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
-          "If-None-Match": "*",
-          "X-Zid": tenantId,
-        },
-        body: JSON.stringify(data),
-      });
+    const r = await fetch(`${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Content-Type": "application/json",
+        "If-None-Match": "*",
+        ...(tenantId && { "X-Zid": tenantId }),
+      },
+      body: JSON.stringify(data),
+    });
 
-      if (!r.ok) {
-        const body = await r.text();
-        LOG.error("Print task creation failed. Response body:", body);
-        LOG.debug("Fetch response debug info:", {
-          status: r.status,
-          statusText: r.statusText,
-          ok: r.ok,
-          url: r.url,
-          redirected: r.redirected,
-          type: r.type,
-          headers: Object.fromEntries(r.headers.entries()),
-        });
-        throw new Error(`Print task creation failed with status ${r.status}`);
-      }
-      LOG.debug("Print task response status:", r.status);
-    } catch (e) {
-      throw new Error("Printing failed during creation of print task: ", e.message);
+    if (!r.ok) {
+      const body = await r.text();
+      LOG.error("Print task creation failed. Response body:", body);
+      req.reject(500, `Print task creation failed with status ${r.status}`);
     }
-    LOG.info(`Document sent to print queue ${selectedQueue}`);
+
+    LOG.debug(`Document sent to print queue ${selectedQueue}`);
 
     return {
       taskId: itemId,

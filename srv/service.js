@@ -86,7 +86,7 @@ class PrintService extends cds.Service {
     });
 
     this.on("print", async (req) => {
-      return await this.print(req.data);
+      return await this.print(req);
     });
 
     super.init();
