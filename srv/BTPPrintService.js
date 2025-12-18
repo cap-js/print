@@ -104,7 +104,6 @@ module.exports = class BTPPrintService extends PrintService {
     let printTask = {
       numberOfCopies: numberOfCopies,
       username: cds.context?.user?.id,
-      // username: "preceiver",
       qname: selectedQueue,
       printContents: [],
     };
