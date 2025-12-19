@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 - Draft enabled entities can be print enabled
 - Entities with composite keys can be print enabled
+- File upload during printing is now formatted correctly
 
 ## Version 0.1.0 - 2025-11-28
 
