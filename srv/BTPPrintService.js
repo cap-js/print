@@ -77,7 +77,7 @@ module.exports = class BTPPrintService extends PrintService {
           Authorization: `Bearer ${jwt}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(doc.content),
+        body: Buffer.from(doc.content, "base64"),
       });
       const responseData = await response.text();
       doc.objectKey = responseData;
