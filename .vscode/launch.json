@@ -40,6 +40,16 @@
       "runtimeArgs": ["run", "test"],
       "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal"
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "watch sample hybrid",
+      "cwd": "${workspaceFolder}/test/bookshop",
+      "runtimeExecutable": "cds",
+      "runtimeArgs": ["bind", "--exec", "--", "cds", "w"],
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal"
     }
   ]
 }

@@ -23,7 +23,17 @@ cds.once("served", async () => {
           srv.on("READ", entity, async (req) => {
             req.target = printer.entities.Queues;
             req.query.SELECT.from.ref[0] = "PrintService.Queues";
-            return await printer.run(req.query);
+            try {
+              return await printer.run(req.query);
+            } catch (error) {
+              LOG.error(error);
+              // Only return client errors to not show technical errors to the user
+              if (error.code >= 400 && error.code < 500) {
+                req.reject(error.code, error.message);
+              } else {
+                req.reject(500, "QUEUE_UNKNOWN_ERROR");
+              }
+            }
           }),
         );
         continue;
@@ -34,7 +44,17 @@ cds.once("served", async () => {
           srv.on("READ", entity, async (req) => {
             req.target = printer.entities.Files;
             req.query.SELECT.from.ref[0] = "PrintService.Files";
-            return await printer.run(req.query);
+            try {
+              return await printer.run(req.query);
+            } catch (error) {
+              LOG.error(error);
+              // Only return client errors to not show technical errors to the user
+              if (error.code >= 400 && error.code < 500) {
+                req.reject(error.code, error.message);
+              } else {
+                req.reject(500, "FILE_UNKNOWN_ERROR");
+              }
+            }
           }),
         );
       }
@@ -90,14 +110,19 @@ cds.once("served", async () => {
                 ],
               });
 
-              return req.info({
+              return req.notify({
                 status: 200,
                 message: "PRINT_JOB_SENT",
                 args: [object[fileNameAttribute], queueID],
               });
             } catch (error) {
-              LOG.error("Print error:", error);
-              return req.reject({ status: 500, message: "PRINT_UNKNOWN_ERROR" });
+              LOG.error(error);
+              // Only return client errors to not show technical errors to the user
+              if (error.code >= 400 && error.code < 500) {
+                req.reject(error.code, error.message);
+              } else {
+                req.reject(500, "PRINT_UNKNOWN_ERROR");
+              }
             }
           });
         }

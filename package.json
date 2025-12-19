@@ -22,9 +22,9 @@
     "plugin"
   ],
   "dependencies": {
-    "@sap-cloud-sdk/connectivity": "^3.26.4",
-    "@sap-cloud-sdk/http-client": "^4.1.2",
-    "@sap/xssec": "^3.6.2"
+    "@sap-cloud-sdk/connectivity": "^4.2.0",
+    "@sap-cloud-sdk/http-client": "^4.2.0",
+    "@sap-cloud-sdk/resilience": "^4.2.0"
   },
   "peerDependencies": {
     "@sap/cds": ">= 9"
@@ -38,8 +38,7 @@
   ],
   "cds": {
     "requires": {
-      "destinations": true,
-      "PrintService": {
+      "print": {
         "[development]": {
           "kind": "print-to-console"
         },
@@ -53,7 +52,10 @@
           "kind": "print-to-service"
         },
         "vcap": {
-          "tag": "print"
+          "label": "print"
+        },
+        "subscriptionDependency": {
+          "uaa": "xsappname"
         },
         "outbox": true
       },

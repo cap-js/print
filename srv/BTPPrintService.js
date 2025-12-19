@@ -1,48 +1,51 @@
 const PrintService = require("./service");
 const cds = require("@sap/cds");
 const LOG = cds.log("print");
-const {
-  getDestinationFromServiceBinding,
-  transformServiceBindingToClientCredentialsDestination,
-} = require("@sap-cloud-sdk/connectivity");
-const { executeHttpRequest } = require("@sap-cloud-sdk/http-client");
+const { getServiceToken, getServiceCredentials } = require("../lib/btp-utils");
+const TokenCache = require("../lib/token-cache");
+
+const PRINT_SERVICE_NAME = "print";
 
 module.exports = class BTPPrintService extends PrintService {
+  tokenCache = new TokenCache();
+
   async init() {
-    LOG.info("Productive Print service initialized.");
     return super.init();
   }
 
-  /**
-   * Get available print queues
-   */
-  async getQueues() {
-    const destination = await getDestination();
+  async getQueues(req) {
+    const srvUrl = getServiceCredentials(PRINT_SERVICE_NAME)?.service_url;
+    const jwt = await this.getToken(cds.context?.tenant, req);
 
-    const response = await executeHttpRequest(destination, {
-      url: "/qm/api/v1/rest/queues",
+    const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
     });
 
-    const queues = response.data.map((q) => ({ ID: q.qname }));
+    if (!response.ok) {
+      const body = await response.text();
+      LOG.error("Error during Queue retriecal. Response body:", body);
+      req.reject(500, `Unexpected error during Queue retrieval ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    const queues = responseData.map((q) => ({ ID: q.qname }));
 
     return queues;
   }
 
-  /**
-   * Print method that prints to real printer via REST API
-   * This is called when printer.print() is invoked from other services
-   */
-  async print(printRequest) {
-    const { qname, numberOfCopies, docsToPrint } = printRequest;
+  async print(req) {
+    const { qname, numberOfCopies, docsToPrint } = req.data;
 
-    LOG.info(
+    LOG.debug(
       `Print request received for queue: ${qname}, copies: ${numberOfCopies}, documents: ${docsToPrint?.length || 0}`,
     );
 
-    await _print(printRequest);
+    await this._print(req);
 
-    LOG.info(`Print request successfully processed.`);
+    LOG.debug(`Print request successfully processed.`);
 
     return {
       status: "success",
@@ -50,77 +53,64 @@ module.exports = class BTPPrintService extends PrintService {
       taskId: `console-task-${Date.now()}`,
     };
   }
-};
 
-const getDestination = async () => {
-  const destination = await getDestinationFromServiceBinding({
-    destinationName: "print-service",
-    useCache: false,
-    serviceBindingTransformFn: async function (service, options) {
-      return transformServiceBindingToClientCredentialsDestination(
-        Object.assign(service, {
-          credentials: service.credentials.uaa,
-          url: service.credentials.service_url,
-        }),
-        options,
-      );
-    },
-  });
+  async _print(req) {
+    const tenantId = cds.context?.tenant;
+    const { qname: selectedQueue, numberOfCopies, docsToPrint } = req.data;
 
-  return destination;
-};
-
-/**
- * Handles the print request.
- * @param {Object} _ - Unused parameter.
- * @param {Object} req - The request object.
- */
-const _print = async function (printRequest) {
-  const { qname: selectedQueue, numberOfCopies, docsToPrint } = printRequest;
-
-  cds.log("=== REQUEST BASIC INFO ===");
-  const destination = await getDestination();
-
-  // 1. Upload documents to be printed
-  const uploadPromises = docsToPrint.map(async (doc) => {
-    if (!doc.content) {
-      LOG.error("No content provided for printing");
-      throw new Error("No content provided for printing");
+    const srvUrl = getServiceCredentials(PRINT_SERVICE_NAME)?.service_url;
+    if (!srvUrl) {
+      req.reject(`Missing binding credentials for service "${PRINT_SERVICE_NAME}"`);
     }
-    try {
-      const response = await executeHttpRequest(destination, {
-        url: "/dm/api/v1/rest/print-documents",
+
+    const jwt = await this.getToken(tenantId, req);
+
+    // 1. Upload documents to be printed
+    const uploadPromises = docsToPrint.map(async (doc) => {
+      if (!doc.content) {
+        req.reject(400, "No content provided for printing");
+      }
+
+      const response = await fetch(`${srvUrl}/dm/api/v1/rest/print-documents`, {
         method: "POST",
-        data: doc.content,
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(doc.content),
       });
-      doc.objectKey = response.data;
-    } catch (e) {
-      LOG.error(`Error in uploading document ${doc.fileName}: `, e.message);
-      throw new Error(`Printing failed during upload of document ${doc.fileName}.`);
-    }
-  });
+      const responseData = await response.text();
+      doc.objectKey = responseData;
 
-  await Promise.all(uploadPromises);
-
-  LOG.info("All documents uploaded successfully");
-
-  let printTask = {
-    numberOfCopies: numberOfCopies,
-    username: cds.context?.user?.id,
-    // username: "preceiver",
-    qname: selectedQueue,
-    printContents: [],
-  };
-  docsToPrint.forEach(async (doc) => {
-    printTask.printContents.push({
-      objectKey: doc.objectKey,
-      documentName: doc.fileName,
+      if (!response.ok) {
+        const body = await response.text();
+        LOG.error(`Printing failed during upload of document ${doc.fileName}: `, body);
+        req.reject(
+          500,
+          `Printing failed during upload of document ${doc.fileName} with status ${response.status}`,
+        );
+      }
     });
-  });
 
-  // 2. Print Task
-  const itemId = printTask.printContents[0].objectKey;
-  try {
+    await Promise.all(uploadPromises);
+
+    LOG.info("All documents uploaded successfully");
+
+    let printTask = {
+      numberOfCopies: numberOfCopies,
+      username: cds.context?.user?.id,
+      qname: selectedQueue,
+      printContents: [],
+    };
+    docsToPrint.forEach(async (doc) => {
+      printTask.printContents.push({
+        objectKey: doc.objectKey,
+        documentName: doc.fileName,
+      });
+    });
+
+    // 2. Print Task
+    const itemId = printTask.printContents[0].objectKey;
     const data = {
       ...printTask,
       metadata: {
@@ -132,19 +122,48 @@ const _print = async function (printRequest) {
       },
     };
 
-    await executeHttpRequest(destination, {
-      url: `/qm/api/v1/rest/print-tasks/${itemId}`,
-      method: "put",
-      data,
-      headers: { requestConfig: { "If-None-Match": "*" } },
+    const r = await fetch(`${srvUrl}/qm/api/v1/rest/print-tasks/${itemId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Content-Type": "application/json",
+        "If-None-Match": "*",
+        ...(tenantId && { "X-Zid": tenantId }),
+      },
+      body: JSON.stringify(data),
     });
-  } catch (e) {
-    LOG.error("Error in sending to print queue: ", e.message);
-    throw new Error("Printing failed during creation of print task.");
-  }
-  LOG.info(`Document sent to print queue ${selectedQueue}`);
 
-  return {
-    taskId: itemId,
-  };
+    if (!r.ok) {
+      const body = await r.text();
+      LOG.error("Print task creation failed. Response body:", body);
+      req.reject(500, `Print task creation failed with status ${r.status}`);
+    }
+
+    LOG.debug(`Document sent to print queue ${selectedQueue}`);
+
+    return {
+      taskId: itemId,
+    };
+  }
+
+  async getToken(tenantId, req) {
+    const tokenFromCache = this.tokenCache.get(tenantId ?? "single-tenant");
+    return (
+      tokenFromCache ??
+      (await (async () => {
+        let jwtFromService, expires_in;
+        try {
+          ({ jwt: jwtFromService, expires_in } = await getServiceToken(
+            PRINT_SERVICE_NAME,
+            cds.context?.tenant !== undefined,
+          ));
+        } catch (e) {
+          LOG.error("Error fetching token for Print Service:", e);
+          req.reject(500, "Error during token fetching");
+        }
+        this.tokenCache.set?.(tenantId ?? "single-tenant", jwtFromService, expires_in);
+        return jwtFromService;
+      })())
+    );
+  }
 };

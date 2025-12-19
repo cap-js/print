@@ -1,5 +1,6 @@
 @impl: './BTPPrintService.js'
 @requires: 'authenticated-user'
+@protocol: 'none'
 service PrintService {
 
   @UI.HeaderInfo: {
