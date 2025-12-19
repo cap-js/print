@@ -15,7 +15,7 @@ module.exports = class BTPPrintService extends PrintService {
 
   async getQueues(req) {
     const srvUrl = getServiceCredentials(PRINT_SERVICE_NAME)?.service_url;
-    const jwt = await this.getToken(cds.context?.tenant);
+    const jwt = await this.getToken(cds.context?.tenant, req);
 
     const response = await fetch(`${srvUrl}/qm/api/v1/rest/queues`, {
       method: "GET",
@@ -59,13 +59,11 @@ module.exports = class BTPPrintService extends PrintService {
     const { qname: selectedQueue, numberOfCopies, docsToPrint } = req.data;
 
     const srvUrl = getServiceCredentials(PRINT_SERVICE_NAME)?.service_url;
-
-    let jwt = "";
-    try {
-      jwt = await this.getToken(tenantId);
-    } catch (e) {
-      req.reject(500, "Error during token fetching", e.message);
+    if (!srvUrl) {
+      req.reject(`Missing binding credentials for service "${PRINT_SERVICE_NAME}"`);
     }
+
+    const jwt = await this.getToken(tenantId, req);
 
     // 1. Upload documents to be printed
     const uploadPromises = docsToPrint.map(async (doc) => {
@@ -148,15 +146,21 @@ module.exports = class BTPPrintService extends PrintService {
     };
   }
 
-  async getToken(tenantId) {
+  async getToken(tenantId, req) {
     const tokenFromCache = this.tokenCache.get(tenantId ?? "single-tenant");
     return (
       tokenFromCache ??
       (await (async () => {
-        const { jwt: jwtFromService, expires_in } = await getServiceToken(
-          PRINT_SERVICE_NAME,
-          cds.context?.tenant !== undefined,
-        );
+        let jwtFromService, expires_in;
+        try {
+          ({ jwt: jwtFromService, expires_in } = await getServiceToken(
+            PRINT_SERVICE_NAME,
+            cds.context?.tenant !== undefined,
+          ));
+        } catch (e) {
+          LOG.error("Error fetching token for Print Service:", e);
+          req.reject(500, "Error during token fetching");
+        }
         this.tokenCache.set?.(tenantId ?? "single-tenant", jwtFromService, expires_in);
         return jwtFromService;
       })())
