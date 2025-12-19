@@ -55,10 +55,13 @@ class PrintService extends cds.Service {
         .columns(
           ...largeBinaryFields.map(
             (f) =>
-              cds.model.definitions[entityName].elements[f.property]["@Core.ContentDisposition"][
+              cds.model.definitions[entityName].elements[f.property]["@Core.ContentDisposition"]?.[
                 "="
               ] ??
-              cds.model.definitions[entityName].elements[f.property]["@Core.ContentDisposition"],
+              cds.model.definitions[entityName].elements[f.property]["@Core.ContentDisposition"] ??
+              cds.model.definitions[entityName].elements[f.property][
+                "@Core.ContentDisposition.Filename"
+              ]?.["="],
           ),
         );
 
@@ -66,8 +69,11 @@ class PrintService extends cds.Service {
         const { entityName, property } = field;
 
         const fileNameProp =
-          cds.model.definitions[entityName].elements[property]["@Core.ContentDisposition"]["="] ??
-          cds.model.definitions[entityName].elements[property]["@Core.ContentDisposition"];
+          cds.model.definitions[entityName].elements[property]["@Core.ContentDisposition"]?.["="] ??
+          cds.model.definitions[entityName].elements[property]["@Core.ContentDisposition"] ??
+          cds.model.definitions[entityName].elements[property][
+            "@Core.ContentDisposition.Filename"
+          ]?.["="];
         field.fileName = fileNames[fileNameProp];
         field.label = cds.i18n.labels.for(cds.model.definitions[entityName].elements[property]);
         field.label ??= property;

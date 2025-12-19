@@ -16,11 +16,11 @@ annotate service.Books with @(UI.FieldGroup #PrintFileGroup: {
   Data : [
     {
       $Type: 'UI.DataField',
-      Value: fileName,
+      Value: file,
     },
     {
       $Type: 'UI.DataField',
-      Value: fileName2,
+      Value: file2,
     }
   ]
 });
@@ -37,7 +37,7 @@ annotate service.BooksWithOneFile with @(UI.FieldGroup #PrintFileGroup: {
   $Type: 'UI.FieldGroupType',
   Data : [{
     $Type: 'UI.DataField',
-    Value: fileName,
+    Value: file,
   }, ]
 });
 

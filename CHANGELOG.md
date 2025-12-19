@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ### Added
 
 - Multitenancy support
+- Support for `@Core.ContentDisposition.Filename` to specify filename
 
 ### Fixed
 
