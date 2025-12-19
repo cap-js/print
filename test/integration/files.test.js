@@ -19,14 +19,14 @@ describe("Print files VH tests", () => {
     expect(response.data.value[0]).toMatchObject({
       entityName: "CatalogService.Books",
       property: "file",
-      fileName: "Book_207_Summary.pdf",
+      fileName: "Book_207_Summary",
       label: "Summaryyy",
     });
 
     expect(response.data.value[1]).toMatchObject({
       entityName: "CatalogService.Books",
       property: "file2",
-      fileName: "Book_207_Summary2.pdf",
+      fileName: "Book_207_Summary2",
       label: "Summaryyy2",
     });
 
@@ -104,14 +104,14 @@ describe("Print files VH tests", () => {
     expect(response.data.value[0]).toMatchObject({
       entityName: "CatalogService.Books",
       property: "file",
-      fileName: "Book_207_Summary.pdf",
+      fileName: "Book_207_Summary",
       label: "Summaryyy",
     });
 
     expect(response.data.value[1]).toMatchObject({
       entityName: "CatalogService.Books",
       property: "file2",
-      fileName: "Book_207_Summary2.pdf",
+      fileName: "Book_207_Summary2",
       label: "Summaryyy2",
     });
 
@@ -129,14 +129,14 @@ describe("Print files VH tests", () => {
     expect(response.data.value[0]).toMatchObject({
       entityName: "CatalogService.CompositeKeys",
       property: "file",
-      fileName: "Book_Composite_Summary.pdf",
+      fileName: "Book_Composite_Summary",
       label: "Summaryyy",
     });
 
     expect(response.data.value[1]).toMatchObject({
       entityName: "CatalogService.CompositeKeys",
       property: "file2",
-      fileName: "Book_Composite_Summary_2.pdf",
+      fileName: "Book_Composite_Summary_2",
       label: "Summaryyy2",
     });
 

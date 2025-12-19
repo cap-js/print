@@ -140,7 +140,10 @@ function checkPrintParamsInEntity(entity) {
   if (files.length === 1) return true;
 
   files.forEach((file) => {
-    if (!file["@Core.ContentDisposition"]?.["="]) {
+    if (
+      !file["@Core.ContentDisposition"]?.["="] &&
+      !file["@Core.ContentDisposition.Filename"]?.["="]
+    ) {
       return cds.error(
         `No file name provided. Please add @Core.ContentDisposition to the ${file.name}.`,
       );
@@ -154,11 +157,15 @@ function getPrintParamsAttribute(entity, data) {
   let fileNameAttribute, contentAttribute;
   if (data[FILE_ELEMENT]) {
     contentAttribute = data[FILE_ELEMENT];
-    fileNameAttribute = entity.elements[contentAttribute]["@Core.ContentDisposition"]?.["="];
+    fileNameAttribute =
+      entity.elements[contentAttribute]["@Core.ContentDisposition"]?.["="] ??
+      entity.elements[contentAttribute]["@Core.ContentDisposition.Filename"]?.["="];
   } else {
     const content = Object.values(entity.elements).find((el) => el.type === "cds.LargeBinary");
     contentAttribute = content.name;
-    fileNameAttribute = content["@Core.ContentDisposition"]?.["="];
+    fileNameAttribute =
+      content["@Core.ContentDisposition"]?.["="] ??
+      content["@Core.ContentDisposition.Filename"]?.["="];
   }
 
   return {

@@ -78,8 +78,8 @@ module.exports = async function () {
           ...book,
           file: templatePDF,
           file2: templatePDF,
-          fileName: `Book_${book.ID}_Summary.pdf`,
-          fileName2: `Book_${book.ID}_Summary2.pdf`,
+          fileName: `Book_${book.ID}_Summary`,
+          fileName2: `Book_${book.ID}_Summary2`,
         })
         .then(() => {
           console.log(`Inserted book ${book.ID}: ${book.title}`);
@@ -88,7 +88,7 @@ module.exports = async function () {
         .entries({
           ...book,
           file: templatePDF,
-          fileName: `Book_${book.ID}_Summary.pdf`,
+          fileName: `Book_${book.ID}_Summary`,
         })
         .then(() => {
           console.log(`Inserted book ${book.ID}: ${book.title}`);
@@ -101,9 +101,9 @@ module.exports = async function () {
       ID: 1,
       ID2: 2,
       file: templatePDF,
-      fileName: `Book_Composite_Summary.pdf`,
+      fileName: `Book_Composite_Summary`,
       file2: templatePDF,
-      fileName2: `Book_Composite_Summary_2.pdf`,
+      fileName2: `Book_Composite_Summary_2`,
     }),
   );
 
