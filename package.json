@@ -1,6 +1,6 @@
 {
   "name": "@cap-js/print",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CAP plugin for SAP Cloud Print Service.",
   "repository": "cap-js/print",
   "homepage": "https://cap.cloud.sap/",
