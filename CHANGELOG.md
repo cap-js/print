@@ -7,9 +7,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ## Version 0.2.0 - 2025-12-19
 
 ### Added
+
 - Multitenancy support
 
 ### Fixed
+
 - Draft enabled entities can be print enabled
 - Entities with composite keys can be print enabled
 
