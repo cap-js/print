@@ -35,6 +35,7 @@ module.exports = class LocalPrintService extends PrintService {
   /**
    * Print method that outputs to console instead of real printer
    * This is called when printer.print() is invoked from other services
+   * @param {import('@sap/cds').Request} req - The request object
    */
   async print(req) {
     const { qname: selectedQueue, numberOfCopies, docsToPrint } = req.data;
