@@ -11,9 +11,6 @@
     "watch:hybrid": "cds watch --profile hybrid"
   },
   "private": true,
-  "devDependencies": {
-    "cds-launchpad-plugin": "^2.2.0"
-  },
   "sapux": [
     "app/browse",
     "app/admin-books",
