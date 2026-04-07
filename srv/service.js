@@ -166,7 +166,7 @@ class PrintService extends cds.Service {
       const left = item[expr[index].ref[0]];
       const op = expr[index + 1];
       const right = expr[index + 2]?.val;
-      let res = false;
+      let res;
       switch (op) {
         case "=":
           res = left === right;
