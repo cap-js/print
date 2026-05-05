@@ -1,3 +1,4 @@
+test
 # Welcome to @cap-js/print
 
 [![REUSE status](https://api.reuse.software/badge/github.com/cap-js/print)](https://api.reuse.software/info/github.com/cap-js/print)
